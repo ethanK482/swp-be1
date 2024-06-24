@@ -1,13 +1,15 @@
 package swp.group2.swpbe.user.response;
 
+import swp.group2.swpbe.constant.UserRole;
+
 public class LoginResponse {
     private String token;
-    private String role;
+    private UserRole role;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String token, String role) {
+    public LoginResponse(String token, UserRole role) {
         this.token = token;
         this.role = role;
     }
@@ -20,11 +22,11 @@ public class LoginResponse {
         this.token = token;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return this.role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 

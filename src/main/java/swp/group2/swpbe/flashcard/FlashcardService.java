@@ -28,13 +28,13 @@ public class FlashcardService {
         String topicId = body.getTopicId();
         Flashcard flashcard = new Flashcard(name, userId, topicId, description);
         List<FlashcardQuestionDTO> questionList = body.getQuestions();
-        Flashcard newflashcard = flashcardRepository.save(flashcard);
+        Flashcard newFlashcard = flashcardRepository.save(flashcard);
         for (int i = 0; i < questionList.size(); i++) {
-            FlashcardsQuestion quesion = new FlashcardsQuestion(newflashcard, questionList.get(i).getQuestion(),
+            FlashcardsQuestion question = new FlashcardsQuestion(newFlashcard, questionList.get(i).getQuestion(),
                     questionList.get(i).getAnswer());
-            flashcardQuestionRepository.save(quesion);
+            flashcardQuestionRepository.save(question);
         }
-        return newflashcard;
+        return newFlashcard;
     }
 
     @Transactional
@@ -42,8 +42,9 @@ public class FlashcardService {
         String name = body.getName();
         String description = body.getDescription();
         String topicId = body.getTopicId();
-        Flashcard flashcard = flashcardRepository.findByIdAndUserId(Integer.parseInt(flashcardId),userId );
-        if(flashcard == null ) return null;
+        Flashcard flashcard = flashcardRepository.findByIdAndUserId(Integer.parseInt(flashcardId), userId);
+        if (flashcard == null)
+            return null;
         flashcard.setName(name);
         flashcard.setDescription(description);
         flashcard.setTopicId(topicId);
@@ -58,13 +59,15 @@ public class FlashcardService {
     }
 
     public List<Flashcard> getAllFlashCard() {
-        List<Flashcard> flashcards =  flashcardRepository.findAll();
+        List<Flashcard> flashcards = flashcardRepository.findAll();
         Collections.sort(flashcards, new Comparator<Flashcard>() {
             @Override
             public int compare(Flashcard o1, Flashcard o2) {
-                long countUnhelpful1 = o1.getReviews().stream().filter(review -> ReviewState.helpful.equals(review.getState())).count();
-                long countUnhelpful2 = o2.getReviews().stream().filter(review ->  ReviewState.helpful.equals(review.getState())).count();
-                return Long.compare(countUnhelpful2,countUnhelpful1);
+                long countUnhelpful1 = o1.getReviews().stream()
+                        .filter(review -> ReviewState.HELPFUL.equals(review.getState())).count();
+                long countUnhelpful2 = o2.getReviews().stream()
+                        .filter(review -> ReviewState.UNHELPFUL.equals(review.getState())).count();
+                return Long.compare(countUnhelpful2, countUnhelpful1);
             }
         });
         return flashcards;
