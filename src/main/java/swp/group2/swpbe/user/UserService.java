@@ -19,6 +19,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import swp.group2.swpbe.JwtTokenProvider;
 import swp.group2.swpbe.constant.ReviewState;
+import swp.group2.swpbe.constant.UserRole;
 import swp.group2.swpbe.document.DocumentRepository;
 import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.document.entities.DocumentReview;
@@ -247,7 +248,7 @@ public class UserService {
     }
 
     public List<User> getAllExpert() {
-        return userRepository.findByRole("expert");
+        return userRepository.findByRole(UserRole.EXPERT);
     }
 
     public List<User> getAllUser() {
