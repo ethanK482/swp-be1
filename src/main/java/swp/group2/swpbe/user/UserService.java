@@ -247,6 +247,9 @@ public class UserService {
     public List<User> getAllExpert() {
         return userRepository.findByRole("expert");
     }
+    public List<User> getAllUserRole() {
+        return userRepository.findByRole("user");
+    }
 
     public List<User> getAllUser() {
         return userRepository.findAll();

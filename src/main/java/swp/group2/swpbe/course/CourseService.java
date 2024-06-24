@@ -117,6 +117,16 @@ public class CourseService {
     public List<CourseOrder> getUserOrder(String userId) {
         return courseOrderRepository.findByUserIdAndPaymentStatus(Integer.parseInt(userId), "paid");
     }
+    public Course getCourseById(int courseId) {
+        Course course = courseRepository.findById(courseId);
+        if (course == null) {
+            throw new ApiRequestException("Course not found", HttpStatus.NOT_FOUND);
+        }
+        return course;
+    }
+    public List<CourseOrder> getPaidOrders() {
+        return courseOrderRepository.findByPaymentStatus("paid");
+    }
 
     public void createReview(ReviewCourseDTO body, int userId) {
         int courseId = body.getCourseId();
