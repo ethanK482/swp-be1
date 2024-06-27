@@ -1,9 +1,10 @@
 package swp.group2.swpbe.user.entities;
 
 import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import swp.group2.swpbe.constant.UserRole;
 
@@ -18,6 +19,7 @@ public class User {
     private String password;
     @Column(name = "is_verify_email")
     private int isVerifyEmail;
+      @Enumerated(EnumType.STRING) 
     private UserRole role;
     @Column(name = "avatar_url")
     private String avatarUrl;

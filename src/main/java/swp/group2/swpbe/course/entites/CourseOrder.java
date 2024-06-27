@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import swp.group2.swpbe.constant.PaymentStatus;
 
 @Entity(name = "course_order")
 public class CourseOrder {
@@ -20,7 +23,8 @@ public class CourseOrder {
     @Column(name = "user_id")
     private int userId;
     @Column(name = "payment_status")
-    private String paymentStatus;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
     @Column(name = "created_at")
     private Date createdAt;
     @Column(name = "transaction_id")
@@ -33,14 +37,13 @@ public class CourseOrder {
     public CourseOrder() {
     }
 
-    public CourseOrder(Course course, int userId, String paymentStatus, String transactionId) {
+    public CourseOrder(Course course, int userId, PaymentStatus paymentStatus, String transactionId) {
         this.course = course;
         this.userId = userId;
         this.paymentStatus = paymentStatus;
         this.createdAt = new Date();
         this.transactionId = transactionId;
     }
-
 
     public int getId() {
         return this.id;
@@ -58,11 +61,11 @@ public class CourseOrder {
         this.userId = userId;
     }
 
-    public String getPaymentStatus() {
+    public PaymentStatus getPaymentStatus() {
         return this.paymentStatus;
     }
 
-    public void setPaymentStatus(String paymentStatus) {
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
 
@@ -89,6 +92,5 @@ public class CourseOrder {
     public void setCourse(Course course) {
         this.course = course;
     }
-    
 
 }

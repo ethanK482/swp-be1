@@ -37,10 +37,10 @@ public class PaymentController {
     CourseRepository courseRepository;
     @Autowired
     CourseOrderRepository courseOrderRepository;
-    @Autowired
 
     @Value("${allow.origin}")
     private String allowedOrigins;
+    @Autowired
     WalletRepository walletRepository;
     @Value("${stripe.api.key}")
     private String stripeApiKey;
@@ -96,7 +96,7 @@ public class PaymentController {
             @RequestBody String payload, HttpServletRequest request) {
         Event event = null;
         String header = request.getHeader("Stripe-Signature");
-        String COMPLETED_EVENT="checkout.session.completed";
+        String COMPLETED_EVENT = "checkout.session.completed";
         try {
             event = Webhook.constructEvent(payload, header, signSecret);
             if (event.getType().equals(COMPLETED_EVENT)) {
@@ -106,17 +106,17 @@ public class PaymentController {
                 int userId = Integer.parseInt(session.getMetadata().get("userId"));
                 String courseId = session.getMetadata().get("courseId");
                 int expertId = Integer.parseInt(session.getMetadata().get("expertId"));
-                String paymentStatus = session.getPaymentStatus();
+                PaymentStatus paymentStatus = PaymentStatus.valueOf(session.getPaymentStatus());
                 Double amount = (double) session.getAmountTotal();
                 Double expertAmount = Common.calculateExpertAmount(amount);
                 Course course = courseRepository.findById(Integer.parseInt(courseId));
                 CourseOrder order = new CourseOrder(course, userId, paymentStatus,
                         transactionId);
                 courseOrderRepository.save(order);
-                if (PaymentStatus.PAID.name().equalsIgnoreCase(order.getPaymentStatus())) {
+                if (PaymentStatus.paid.equals(order.getPaymentStatus())) {
                     Wallet wallet = walletRepository.findByUserId(expertId);
                     if (wallet == null) {
-                        Wallet newWallet = new Wallet(userId, expertAmount);
+                        Wallet newWallet = new Wallet(expertId, expertAmount);
                         walletRepository.save(newWallet);
                     } else {
                         wallet.setBalance(wallet.getBalance() + expertAmount);
