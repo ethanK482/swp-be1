@@ -1,12 +1,8 @@
 package swp.group2.swpbe.user;
-
 import org.springframework.stereotype.Repository;
-
 import swp.group2.swpbe.constant.UserRole;
 import swp.group2.swpbe.user.entities.User;
-
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
