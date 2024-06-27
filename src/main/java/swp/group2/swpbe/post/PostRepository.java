@@ -10,5 +10,4 @@ import swp.group2.swpbe.post.entities.Post;
 public interface PostRepository extends JpaRepository<Post, Integer>{
 	 Post findById(int id);
 	 List<Post> findAllByOrderByCreatedAtDesc();
-
 }
