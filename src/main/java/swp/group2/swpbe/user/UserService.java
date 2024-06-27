@@ -6,18 +6,18 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import swp.group2.swpbe.JwtTokenProvider;
 import swp.group2.swpbe.constant.ReviewState;
+import swp.group2.swpbe.constant.UserRole;
 import swp.group2.swpbe.document.DocumentRepository;
 import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.document.entities.DocumentReview;
@@ -49,6 +49,9 @@ public class UserService {
     FlashcardRepository flashcardRepository;
     int strength = 10;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(strength, new SecureRandom());
+
+    @Value("${allow.origin}")
+    private String allowedOrigins;
 
     public User signup(SignupDTO user) {
         String full_name = user.getFull_name();
@@ -107,7 +110,6 @@ public class UserService {
             throw new ApiRequestException("Invalid token", HttpStatus.BAD_REQUEST);
         }
         User user = userRepository.findByEmailAndSid(email, null);
-
         user.setIsVerifyEmail(1);
         user.setUpdatedAt(new Date());
         return userRepository.save(user);
@@ -175,10 +177,9 @@ public class UserService {
         List<Document> documents = documentRepository.findByUserId(id);
         int totalHelpful = 0;
         int totalUnHelpful = 0;
-        // todo: optimize
         for (Flashcard flashcard : flashcards) {
             for (FlashcardReview review : flashcard.getReviews()) {
-                if (review.getState().equals(ReviewState.helpful)) {
+                if (review.getState().equals(ReviewState.HELPFUL)) {
                     totalHelpful++;
                 } else
                     totalUnHelpful++;
@@ -186,10 +187,9 @@ public class UserService {
             }
 
         }
-        // todo: optimize
         for (Document document : documents) {
             for (DocumentReview review : document.getReviews()) {
-                if (review.getState().equals(ReviewState.helpful)) {
+                if (review.getState().equals(ReviewState.HELPFUL)) {
                     totalHelpful++;
                 } else
                     totalUnHelpful++;
@@ -245,7 +245,7 @@ public class UserService {
     }
 
     public List<User> getAllExpert() {
-        return userRepository.findByRole("expert");
+        return userRepository.findByRole(UserRole.EXPERT);
     }
     public List<User> getAllUserRole() {
         return userRepository.findByRole("user");
@@ -457,7 +457,7 @@ public class UserService {
                 "                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n" + //
                 "                      <tr>\n" + //
                 "                        <td align=\"center\" bgcolor=\"#1a82e2\" style=\"border-radius: 6px;\">\n" + //
-                "                          <a href=" + "http://furecods.site/change-password?token=" + token
+                "                          <a href=" + allowedOrigins+"/change-password?token=" + token
                 + "  target=\"_blank\" style=\"display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;\">"
                 + buttonTitle + "</a>\n" + //
                 "                        </td>\n" + //
@@ -741,7 +741,7 @@ public class UserService {
                 "                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n" + //
                 "                      <tr>\n" + //
                 "                        <td align=\"center\" bgcolor=\"#1a82e2\" style=\"border-radius: 6px;\">\n" + //
-                "                          <a href=" + "http://furecods.site:8080/verify?token=" + token
+                "                          <a href=" + allowedOrigins+":8080/verify?token=" + token
                 + "  target=\"_blank\" style=\"display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;\">"
                 + buttonTitle + "</a>\n" + //
                 "                        </td>\n" + //

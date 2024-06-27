@@ -1,10 +1,12 @@
 package swp.group2.swpbe.user.entities;
 
 import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import swp.group2.swpbe.constant.UserRole;
 
 @Entity
 public class User {
@@ -17,7 +19,8 @@ public class User {
     private String password;
     @Column(name = "is_verify_email")
     private int isVerifyEmail;
-    private String role;
+      @Enumerated(EnumType.STRING) 
+    private UserRole role;
     @Column(name = "avatar_url")
     private String avatarUrl;
     @Column(name = "created_at")
@@ -32,20 +35,19 @@ public class User {
         this.fullName = fullName;
         this.email = email;
         this.isVerifyEmail = isVerifyEmail;
-        this.role = "user";
+        this.role = UserRole.USER;
         this.avatarUrl = avatarUrl;
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.password = password;
         this.sid = sid;
         this.about = null;
-        this.dob=null;
-        this.gender=null;
+        this.dob = null;
+        this.gender = null;
     }
 
     public User() {
     }
-
 
     public int getId() {
         return this.id;
@@ -95,11 +97,11 @@ public class User {
         this.isVerifyEmail = isVerifyEmail;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return this.role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
@@ -150,5 +152,5 @@ public class User {
     public void setGender(String gender) {
         this.gender = gender;
     }
-   
+
 }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import swp.group2.swpbe.constant.UserRole;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.user.UserRepository;
 import swp.group2.swpbe.user.entities.User;
@@ -29,18 +30,13 @@ public class AuthService {
         return userId;
     }
 
-    public boolean isContributor(String userId) {
-        User user = userRepository.findById(Integer.parseInt(userId));
-        return user.getRole().equals("contributor");
-    }
-
     public boolean isExpert(String userId) {
         User user = userRepository.findById(Integer.parseInt(userId));
-        return user.getRole().equals("expert");
+        return user.getRole().equals(UserRole.EXPERT);
     }
 
     public boolean isAdmin(String userId) {
         User user = userRepository.findById(Integer.parseInt(userId));
-        return user.getRole().equals("admin");
+        return user.getRole().equals(UserRole.ADMIN);
     }
 }

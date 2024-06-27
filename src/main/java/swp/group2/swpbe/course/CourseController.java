@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,11 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 import swp.group2.swpbe.AuthService;
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.Common;
+import swp.group2.swpbe.constant.PaymentStatus;
 import swp.group2.swpbe.course.dto.ReviewCourseDTO;
 import swp.group2.swpbe.course.entites.Course;
 import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.course.entites.Lesson;
 import swp.group2.swpbe.course.response.ExpertCourseResponse;
+import swp.group2.swpbe.course.response.StudentResponse;
 import swp.group2.swpbe.exception.ApiRequestException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +62,17 @@ public class CourseController {
                     lessonHandleArr[1]);
         }
         return course;
+    }
+
+    @PostMapping("expert/add/lesson/{courseId}")
+    public ResponseEntity<?> create(@PathVariable int courseId, @RequestParam("files") MultipartFile[] files,
+            @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        if (authService.isExpert(userId) == false) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        courseService.addCourseLesson(courseId, files, userId);
+        return new ResponseEntity<>("add lesson successfully", HttpStatus.OK);
     }
 
     @PutMapping("expert/course/{id}")
@@ -114,7 +126,8 @@ public class CourseController {
             Course courseI = courses.get(i);
             List<Lesson> sortedLessons = courseI.getLessons();
             sortedLessons.sort(Comparator.comparingInt(Lesson::getLesson_order));
-            List<CourseOrder> orders = courseOrderRepository.findByCourseIdAndPaymentStatus(courseI.getId(), "paid");
+            List<CourseOrder> orders = courseOrderRepository.findByCourseIdAndPaymentStatus(courseI.getId(),
+                    PaymentStatus.paid);
             int totalOrder = orders.size();
             Double income = Common.calculateExpertAmount(courseI.getPrice()) * totalOrder;
             ExpertCourseResponse courseResponse = new ExpertCourseResponse(totalOrder, income, courseI.getExpertId(),
@@ -156,6 +169,16 @@ public class CourseController {
         return courses;
     }
 
+    @GetMapping("course/students")
+    public List<StudentResponse> getOrderHistories(@RequestHeader("Authorization") String token,
+            @RequestParam(name = "courseId") int courseId) {
+        String userId = authService.loginUser(token);
+        if (authService.isExpert(userId) == false) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        return courseService.getCourseStudent(courseId, userId);
+    }
+
     @PutMapping("admin/course/{id}")
     public Course updateCourse(
             @PathVariable int id,
@@ -183,12 +206,6 @@ public class CourseController {
         String userId = authService.loginUser(token);
         courseService.createReview(body, Integer.parseInt(userId));
         return new ResponseEntity<>("Review course successfully", HttpStatus.OK);
-    }
-
-    @PostMapping("user/buy-course")
-    public String buyCourse(@RequestBody String entity) {
-
-        return entity;
     }
 
 }

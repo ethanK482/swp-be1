@@ -4,8 +4,8 @@ import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.param.checkout.SessionCreateParams;
-
 import jakarta.servlet.http.HttpServletRequest;
+import swp.group2.swpbe.constant.PaymentStatus;
 import swp.group2.swpbe.course.CourseOrderRepository;
 import swp.group2.swpbe.course.CourseRepository;
 import swp.group2.swpbe.course.entites.Course;
@@ -13,11 +13,9 @@ import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.user.WalletRepository;
 import swp.group2.swpbe.user.entities.Wallet;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -40,11 +37,15 @@ public class PaymentController {
     CourseRepository courseRepository;
     @Autowired
     CourseOrderRepository courseOrderRepository;
+
+    @Value("${allow.origin}")
+    private String allowedOrigins;
     @Autowired
     WalletRepository walletRepository;
     @Value("${stripe.api.key}")
     private String stripeApiKey;
-    private static final String SIGNING_SECRET = "whsec_4b4d55f0adbf805426f66f3f9b2d7ff6832a3a958af197e2e16552fa69e4df74";
+    @Value("${stripe.sign.secret}")
+    private String signSecret;
 
     @PostMapping("/payment")
     public String createPaymentUrl(@RequestHeader("Authorization") String token,
@@ -56,7 +57,6 @@ public class PaymentController {
             throw new ApiRequestException("You had bought this course already", HttpStatus.BAD_REQUEST);
         }
         try {
-
             Stripe.apiKey = stripeApiKey;
             Course course = courseRepository.findById(Integer.parseInt(courseId));
             String currency = "vnd";
@@ -67,15 +67,15 @@ public class PaymentController {
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("http://furecods.site/payment/result?state=success")
-                    .setCancelUrl("http://furecods.site/payment/result")
+                    .setSuccessUrl(allowedOrigins + "/payment/result?state=success")
+                    .setCancelUrl(allowedOrigins + "/payment/result")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
                                     .setQuantity(1L)
                                     .setPriceData(
                                             SessionCreateParams.LineItem.PriceData.builder()
                                                     .setCurrency(currency)
-                                                    .setUnitAmountDecimal(new BigDecimal(course.getPrice()))
+                                                    .setUnitAmountDecimal(BigDecimal.valueOf(course.getPrice()))
                                                     .setProductData(
                                                             SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                                     .setName(course.getName())
@@ -84,7 +84,6 @@ public class PaymentController {
                                     .build())
                     .putAllMetadata(metadata)
                     .build();
-
             Session session = Session.create(params);
             return session.getUrl();
         } catch (StripeException e) {
@@ -97,29 +96,27 @@ public class PaymentController {
             @RequestBody String payload, HttpServletRequest request) {
         Event event = null;
         String header = request.getHeader("Stripe-Signature");
+        String COMPLETED_EVENT = "checkout.session.completed";
         try {
-            event = Webhook.constructEvent(payload, header, SIGNING_SECRET);
-            if (event.getType().equals("checkout.session.completed")) {
+            event = Webhook.constructEvent(payload, header, signSecret);
+            if (event.getType().equals(COMPLETED_EVENT)) {
                 @SuppressWarnings("deprecation")
                 Session session = (Session) event.getData().getObject();
-
                 String transactionId = session.getPaymentIntent();
                 int userId = Integer.parseInt(session.getMetadata().get("userId"));
                 String courseId = session.getMetadata().get("courseId");
                 int expertId = Integer.parseInt(session.getMetadata().get("expertId"));
-                //todo: check status.
-                String paymentStatus = session.getPaymentStatus();
+                PaymentStatus paymentStatus = PaymentStatus.valueOf(session.getPaymentStatus());
                 Double amount = (double) session.getAmountTotal();
                 Double expertAmount = Common.calculateExpertAmount(amount);
                 Course course = courseRepository.findById(Integer.parseInt(courseId));
-
                 CourseOrder order = new CourseOrder(course, userId, paymentStatus,
                         transactionId);
                 courseOrderRepository.save(order);
-                if (order.getPaymentStatus().equals("paid")) {
+                if (PaymentStatus.paid.equals(order.getPaymentStatus())) {
                     Wallet wallet = walletRepository.findByUserId(expertId);
                     if (wallet == null) {
-                        Wallet newWallet = new Wallet(userId, expertAmount);
+                        Wallet newWallet = new Wallet(expertId, expertAmount);
                         walletRepository.save(newWallet);
                     } else {
                         wallet.setBalance(wallet.getBalance() + expertAmount);

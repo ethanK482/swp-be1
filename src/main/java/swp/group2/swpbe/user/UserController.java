@@ -1,6 +1,7 @@
 package swp.group2.swpbe.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,6 @@ import swp.group2.swpbe.user.dto.UpdatePasswordDTO;
 import swp.group2.swpbe.user.dto.UpdateProfileDTO;
 import swp.group2.swpbe.user.entities.User;
 import swp.group2.swpbe.user.response.LoginResponse;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +42,9 @@ public class UserController {
     CloudinaryService cloudinaryService;
     @Autowired
     AuthService authService;
+
+    @Value("${allow.origin}")
+    private String allowedOrigins;
 
     @PostMapping("/signup")
     public User create(@RequestBody SignupDTO body) {
@@ -67,7 +70,7 @@ public class UserController {
     public void verifyEmail(@RequestParam(name = "token") String query, HttpServletResponse response) {
         userService.updateVerifyEmail(query);
         try {
-            response.sendRedirect("http://furecods.site/login");
+            response.sendRedirect(allowedOrigins+"/login");
         } catch (Exception e) {
             throw new ApiRequestException("Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -132,6 +135,7 @@ public class UserController {
     public List<User> getAllExpert() {
         return userService.getAllExpert();
     }
+
     @GetMapping("public/users")
     public List<User> getAllUser() {
         return userService.getAllUser();
