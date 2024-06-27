@@ -171,10 +171,9 @@ public class UserService {
         return user;
     }
 
-    public User getUserProfile(String id) {
-        User user = userRepository.findById(Integer.parseInt(id));
-        List<Flashcard> flashcards = flashcardRepository.findByUserId(id);
-        List<Document> documents = documentRepository.findByUserId(id);
+    public int getUserLegit(String userId) {
+        List<Flashcard> flashcards = flashcardRepository.findByUserId(userId);
+        List<Document> documents = documentRepository.findByUserId(userId);
         int totalHelpful = 0;
         int totalUnHelpful = 0;
         for (Flashcard flashcard : flashcards) {
@@ -197,8 +196,14 @@ public class UserService {
             }
 
         }
+        return totalHelpful - totalUnHelpful;
+    }
+
+    public User getUserProfile(String id) {
+        User user = userRepository.findById(Integer.parseInt(id));
+
         UserProfileResponse response = new UserProfileResponse(user.getFullName(), user.getEmail(), "",
-                user.getAvatarUrl(), user.getIsVerifyEmail(), "", totalHelpful - totalUnHelpful);
+                user.getAvatarUrl(), user.getIsVerifyEmail(), "", this.getUserLegit(id));
         response.setAbout(user.getAbout());
         response.setDob(user.getDob());
         response.setGender(user.getGender());
@@ -247,8 +252,9 @@ public class UserService {
     public List<User> getAllExpert() {
         return userRepository.findByRole(UserRole.EXPERT);
     }
+
     public List<User> getAllUserRole() {
-        return userRepository.findByRole("user");
+        return userRepository.findByRole(UserRole.USER);
     }
 
     public List<User> getAllUser() {
@@ -457,7 +463,7 @@ public class UserService {
                 "                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n" + //
                 "                      <tr>\n" + //
                 "                        <td align=\"center\" bgcolor=\"#1a82e2\" style=\"border-radius: 6px;\">\n" + //
-                "                          <a href=" + allowedOrigins+"/change-password?token=" + token
+                "                          <a href=" + allowedOrigins + "/change-password?token=" + token
                 + "  target=\"_blank\" style=\"display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;\">"
                 + buttonTitle + "</a>\n" + //
                 "                        </td>\n" + //
@@ -741,7 +747,7 @@ public class UserService {
                 "                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n" + //
                 "                      <tr>\n" + //
                 "                        <td align=\"center\" bgcolor=\"#1a82e2\" style=\"border-radius: 6px;\">\n" + //
-                "                          <a href=" + allowedOrigins+":8080/verify?token=" + token
+                "                          <a href=" + allowedOrigins + ":8080/verify?token=" + token
                 + "  target=\"_blank\" style=\"display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;\">"
                 + buttonTitle + "</a>\n" + //
                 "                        </td>\n" + //
