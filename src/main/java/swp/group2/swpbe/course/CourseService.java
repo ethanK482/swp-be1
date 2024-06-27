@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.stripe.model.Review;
-
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.constant.PaymentStatus;
 import swp.group2.swpbe.course.dto.ReviewCourseDTO;
@@ -129,6 +126,7 @@ public class CourseService {
     public List<CourseOrder> getUserOrder(String userId) {
         return courseOrderRepository.findByUserIdAndPaymentStatus(Integer.parseInt(userId), PaymentStatus.paid);
     }
+
     public Course getCourseById(int courseId) {
         Course course = courseRepository.findById(courseId);
         if (course == null) {
@@ -136,6 +134,7 @@ public class CourseService {
         }
         return course;
     }
+
     public List<CourseOrder> getPaidOrders() {
         return courseOrderRepository.findByPaymentStatus("paid");
     }
@@ -170,10 +169,6 @@ public class CourseService {
             studentList.add(student);
         }
         return studentList;
-    }
-
-    public Course getCourseById(int id) {
-        return courseRepository.findById(id);
     }
 
     public void addCourseLesson(int courseId, MultipartFile[] files, String expertId) {
