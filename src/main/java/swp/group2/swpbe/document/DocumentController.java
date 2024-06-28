@@ -54,14 +54,12 @@ public class DocumentController {
     @GetMapping("/document")
     public Document getDocument(@RequestBody Map body) {
         String documentId = (String) body.get("documentId");
-        Document document = documentService.getDocumentById(documentId);
-        return document;
+        return documentService.getDocumentById(documentId);
 
     }
 
     @GetMapping("/document/all")
     public List<Document> getAllDocument() {
-        List<Document> allDocuments = documentService.getAllDocuments();
-        return allDocuments;
+        return documentService.getAllDocuments();
     }
 }

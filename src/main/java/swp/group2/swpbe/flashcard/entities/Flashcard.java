@@ -7,10 +7,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import swp.group2.swpbe.constant.ResourceStatus;
 
 @Entity(name = "flashcards")
 public class Flashcard {
@@ -30,6 +33,8 @@ public class Flashcard {
     @OneToMany(mappedBy = "flashcards")
     @JsonManagedReference
     private List<FlashcardsQuestion> questions;
+    @Enumerated(EnumType.STRING)
+    private ResourceStatus state;
 
     @OneToMany(mappedBy = "flashcards")
     @JsonManagedReference
@@ -42,6 +47,7 @@ public class Flashcard {
         this.updatedAt = new Date();
         this.topicId = topicId;
         this.description = description;
+        this.state = ResourceStatus.pending;
     }
 
     public Flashcard() {
@@ -117,6 +123,14 @@ public class Flashcard {
 
     public void setReviews(List<FlashcardReview> reviews) {
         this.reviews = reviews;
+    }
+
+    public ResourceStatus getState() {
+        return this.state;
+    }
+
+    public void setState(ResourceStatus state) {
+        this.state = state;
     }
 
 }
