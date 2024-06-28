@@ -2,15 +2,9 @@ package swp.group2.swpbe.post;
 
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.stream.events.Comment;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import swp.group2.swpbe.constant.ReviewState;
-
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.post.entities.Comments;
 import swp.group2.swpbe.post.entities.Post;
@@ -19,101 +13,96 @@ import swp.group2.swpbe.post.entities.PostLike;
 @Service
 public class PostService {
 	@Autowired
-    PostRepository postRepository;
-	
-    @Autowired
-    PostReviewRepository reviewRepository;
+	PostRepository postRepository;
 
 	@Autowired
-    private CommentRepository commentRepository;
+	PostReviewRepository reviewRepository;
 
+	@Autowired
+	private CommentRepository commentRepository;
 
-	public void createPost(String url, String content, String userId){
-		Post post = new Post( url, userId, content);
+	public void createPost(String url, String content, String userId) {
+		Post post = new Post(url, userId, content);
 		postRepository.save(post);
 	}
-	
-    public Post getPostById(String postId) {
-        Post post = postRepository.findById(Integer.parseInt(postId));
-        return post;
-    }
+
+	public Post getPostById(String postId) {
+		Post post = postRepository.findById(Integer.parseInt(postId));
+		return post;
+	}
 
 	public void updatePost(String id, String url, String content, String userId) {
-        Post post = postRepository.findById(Integer.parseInt(id) );       
+		Post post = postRepository.findById(Integer.parseInt(id));
 		if (post == null) {
 			throw new ApiRequestException("Post not found", HttpStatus.BAD_REQUEST);
-		}		
-		if (!post.getUser_id().equals(userId)  ) {
+		}
+		if (!post.getUser_id().equals(userId)) {
 			throw new ApiRequestException("Unauthorized user", HttpStatus.UNAUTHORIZED);
 		}
 		post.setUpdated_at(new Date());
 		post.setContent(content);
-	
-		if(url != null )    post.setFile_url(url);		
-        postRepository.save(post);
 
-    }
+		if (url != null)
+			post.setFile_url(url);
+		postRepository.save(post);
+
+	}
 
 	public boolean deletePost(int id) {
-        if(id >=1  ){
-            Post post= postRepository.findById(id);
-            if(post!=null){
-                postRepository.delete(post);
-                return true;
-            }
-        }
-        return false;
-    }
+		if (id >= 1) {
+			Post post = postRepository.findById(id);
+			if (post != null) {
+				postRepository.delete(post);
+				return true;
+			}
+		}
+		return false;
+	}
 
-	
-	public List<Post> getAllPosts(){
+	public List<Post> getAllPosts() {
 		return postRepository.findAllByOrderByCreatedAtDesc();
 	}
 
 	public void uploadReview(Post post, String userId) {
-        PostLike postReviewExist = reviewRepository.findByPostAndUserId(post, userId);
-        if (postReviewExist != null) {
-                reviewRepository.delete(postReviewExist);
-                return;
-            } else {                
-        PostLike postLike = new PostLike(userId, post);
-        reviewRepository.save(postLike);
-    }
+		PostLike postReviewExist = reviewRepository.findByPostAndUserId(post, userId);
+		if (postReviewExist != null) {
+			reviewRepository.delete(postReviewExist);
+			return;
+		} else {
+			PostLike postLike = new PostLike(userId, post);
+			reviewRepository.save(postLike);
+		}
 	}
 
-	public void addComment(  String url,String userId, String content, String postId) {
-		Post post = postRepository.findById(Integer.parseInt(postId) );
-		Comments c = new Comments( url, userId, content, post);
+	public void addComment(String url, String userId, String content, String postId) {
+		Post post = postRepository.findById(Integer.parseInt(postId));
+		Comments c = new Comments(url, userId, content, post);
 		commentRepository.save(c);
 	}
 
 	public Comments getCommentsById(String id) {
-		Comments comment = commentRepository.findById(Integer.parseInt(id));
-        return comment;
-    }
-
-	public void updateComment(String id, String userId,  String url,String content) {
-		Comments comment = commentRepository.findById(Integer.parseInt(id));
-		if (comment == null) {
-			throw new ApiRequestException("Comment not found", HttpStatus.BAD_REQUEST);
-		}	else{
-		comment.setUpdatedAt(new Date());	
-		comment.setContent(content);
-		if(url != null )    comment.setFileUrl(url);
-		}
-		commentRepository.save(comment);
-		return;
+		return commentRepository.findById(Integer.parseInt(id));
 	}
 
-	public boolean deleteComment(int id) {
-        if(id >=1  ){
-            Comments comment = commentRepository.findById(id);
-            if(comment!=null){
-                commentRepository.delete(comment);
-                return true;
-            }
-        }
-        return false;
-    }
+	public void updateComment(int id, String userId, String url, String content) {
+		Comments comment = commentRepository.findByIdAndUserId(id, userId);
+		if (comment == null) {
+			throw new ApiRequestException("Comment not found", HttpStatus.BAD_REQUEST);
+		}
+		comment.setUpdatedAt(new Date());
+		comment.setContent(content);
+		if (url != null)
+			comment.setFileUrl(url);
+		commentRepository.save(comment);
+
+	}
+
+	public void deleteComment(int id, String userId) {
+		Comments comment = commentRepository.findByIdAndUserId(id, userId);
+		if (comment == null) {
+			throw new ApiRequestException("Comment not found", HttpStatus.BAD_REQUEST);
+		}
+		commentRepository.delete(comment);
+	}
 
 }

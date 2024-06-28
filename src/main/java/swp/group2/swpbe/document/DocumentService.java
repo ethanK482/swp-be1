@@ -1,4 +1,5 @@
 package swp.group2.swpbe.document;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.document.entities.DocumentReview;
+
 @Service
 public class DocumentService {
     @Autowired
@@ -31,12 +33,12 @@ public class DocumentService {
             @Override
             public int compare(Document o1, Document o2) {
                 long countHelpful1 = o1.getReviews().stream()
-                    .filter(review -> ReviewState.HELPFUL.equals(review.getState()))
-                    .count();
+                        .filter(review -> ReviewState.helpful.equals(review.getState()))
+                        .count();
                 long countHelpful2 = o2.getReviews().stream()
-                    .filter(review -> ReviewState.UNHELPFUL.equals(review.getState()))
-                    .count();
-                return Long.compare(countHelpful2, countHelpful1); 
+                        .filter(review -> ReviewState.unhelpful.equals(review.getState()))
+                        .count();
+                return Long.compare(countHelpful2, countHelpful1);
             }
         });
         return documents;

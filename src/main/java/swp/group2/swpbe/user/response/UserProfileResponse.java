@@ -4,6 +4,7 @@ import swp.group2.swpbe.user.entities.User;
 
 public class UserProfileResponse extends User {
     private int legitMark;
+    private double balance;
 
     public UserProfileResponse(String fullName, String email, String password, String avatarUrl, int isVerifyEmail,
             String sid, int legitMark) {
@@ -20,6 +21,14 @@ public class UserProfileResponse extends User {
 
     public void setLegitMark(int legitMark) {
         this.legitMark = legitMark;
+    }
+
+    public double getBalance() {
+        return this.balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
 }

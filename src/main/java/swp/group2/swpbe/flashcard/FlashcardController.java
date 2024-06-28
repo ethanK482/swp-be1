@@ -48,11 +48,11 @@ public class FlashcardController {
 
     @PostMapping("/flashcard/upload-review")
     public ResponseEntity<?> review(@RequestParam("flashcardId") String flashcardId,
-            @RequestParam("review") ReviewState review,
+            @RequestParam("review") String review,
             @RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
 
-        flashcardService.uploadReviewFlashcard(flashcardId, userId, review);
+        flashcardService.uploadReviewFlashcard(flashcardId, userId, ReviewState.valueOf(review));
         return new ResponseEntity<>("upload review successfully", HttpStatus.OK);
     }
 

@@ -33,6 +33,7 @@ import swp.group2.swpbe.user.dto.SignupDTO;
 import swp.group2.swpbe.user.dto.UpdatePasswordDTO;
 import swp.group2.swpbe.user.dto.UpdateProfileDTO;
 import swp.group2.swpbe.user.entities.User;
+import swp.group2.swpbe.user.entities.Wallet;
 import swp.group2.swpbe.user.response.UserProfileResponse;
 
 @Service
@@ -47,6 +48,8 @@ public class UserService {
     DocumentRepository documentRepository;
     @Autowired
     FlashcardRepository flashcardRepository;
+    @Autowired
+    WalletRepository walletRepository;
     int strength = 10;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(strength, new SecureRandom());
 
@@ -178,7 +181,7 @@ public class UserService {
         int totalUnHelpful = 0;
         for (Flashcard flashcard : flashcards) {
             for (FlashcardReview review : flashcard.getReviews()) {
-                if (review.getState().equals(ReviewState.HELPFUL)) {
+                if (review.getState().equals(ReviewState.helpful)) {
                     totalHelpful++;
                 } else
                     totalUnHelpful++;
@@ -188,7 +191,7 @@ public class UserService {
         }
         for (Document document : documents) {
             for (DocumentReview review : document.getReviews()) {
-                if (review.getState().equals(ReviewState.HELPFUL)) {
+                if (review.getState().equals(ReviewState.helpful)) {
                     totalHelpful++;
                 } else
                     totalUnHelpful++;
@@ -201,13 +204,16 @@ public class UserService {
 
     public User getUserProfile(String id) {
         User user = userRepository.findById(Integer.parseInt(id));
-
+        Wallet userWallet = walletRepository.findByUserId(user.getId());
         UserProfileResponse response = new UserProfileResponse(user.getFullName(), user.getEmail(), "",
                 user.getAvatarUrl(), user.getIsVerifyEmail(), "", this.getUserLegit(id));
         response.setAbout(user.getAbout());
         response.setDob(user.getDob());
         response.setGender(user.getGender());
         response.setId(user.getId());
+        if (userWallet != null)
+            response.setBalance(userWallet.getBalance());
+
         return response;
 
     }

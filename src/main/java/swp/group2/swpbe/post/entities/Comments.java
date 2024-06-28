@@ -9,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 
 @Entity(name = "post_comment")
@@ -17,7 +19,7 @@ public class Comments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String fileUrl;
-	@Column(name = "user_id")
+    @Column(name = "user_id")
     private String userId;
     @Column(name = "created_at")
     private Date createdAt;
@@ -26,18 +28,17 @@ public class Comments {
     private String content;
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonBackReference
     private Post post;
 
-
-    public Comments( String fileUrl, String userId, String content, Post post) {
-		this.id=id;
-		this.fileUrl = fileUrl;
-		this.userId = userId;
-		this.createdAt = new Date();
-		this.updatedAt =new Date();
-		this.content = content;
-		this.post = post;
-	}
+    public Comments(String fileUrl, String userId, String content, Post post) {
+        this.fileUrl = fileUrl;
+        this.userId = userId;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+        this.content = content;
+        this.post = post;
+    }
 
     public Comments() {
     }
@@ -50,7 +51,7 @@ public class Comments {
         this.id = id;
     }
 
-	public String getUserId() {
+    public String getUserId() {
         return userId;
     }
 
@@ -81,7 +82,6 @@ public class Comments {
     public void setPost(Post post) {
         this.post = post;
     }
-
 
     public Date getCreatedAt() {
         return createdAt;

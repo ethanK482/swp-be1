@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import swp.group2.swpbe.constant.ReviewState;
+import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.flashcard.dto.FlashcardDTO;
 import swp.group2.swpbe.flashcard.dto.FlashcardQuestionDTO;
 import swp.group2.swpbe.flashcard.entities.Flashcard;
@@ -39,12 +41,14 @@ public class FlashcardService {
 
     @Transactional
     public Flashcard update(FlashcardDTO body, String flashcardId, String userId) {
+
         String name = body.getName();
         String description = body.getDescription();
         String topicId = body.getTopicId();
         Flashcard flashcard = flashcardRepository.findByIdAndUserId(Integer.parseInt(flashcardId), userId);
-        if (flashcard == null)
-            return null;
+        if (flashcard == null) {
+            throw new ApiRequestException("flashcard not found", HttpStatus.BAD_REQUEST);
+        }
         flashcard.setName(name);
         flashcard.setDescription(description);
         flashcard.setTopicId(topicId);
@@ -64,9 +68,9 @@ public class FlashcardService {
             @Override
             public int compare(Flashcard o1, Flashcard o2) {
                 long countUnhelpful1 = o1.getReviews().stream()
-                        .filter(review -> ReviewState.HELPFUL.equals(review.getState())).count();
+                        .filter(review -> ReviewState.helpful.equals(review.getState())).count();
                 long countUnhelpful2 = o2.getReviews().stream()
-                        .filter(review -> ReviewState.UNHELPFUL.equals(review.getState())).count();
+                        .filter(review -> ReviewState.unhelpful.equals(review.getState())).count();
                 return Long.compare(countUnhelpful2, countUnhelpful1);
             }
         });

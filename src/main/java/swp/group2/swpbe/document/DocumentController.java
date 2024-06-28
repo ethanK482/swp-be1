@@ -43,11 +43,11 @@ public class DocumentController {
 
     @PostMapping("/upload-review")
     public ResponseEntity<?> review(@RequestParam("documentId") String documentId,
-            @RequestParam("review") ReviewState review,
+            @RequestParam("review") String review,
             @RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
         Document document = documentService.getDocumentById(documentId);
-        documentService.uploadReview(document, review, userId);
+        documentService.uploadReview(document, ReviewState.valueOf(review), userId);
         return new ResponseEntity<>("upload review successfully", HttpStatus.OK);
     }
 
