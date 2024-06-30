@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import swp.group2.swpbe.AuthService;
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.JwtTokenProvider;
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.document.entities.Document;
 
@@ -61,5 +63,19 @@ public class DocumentController {
     @GetMapping("/document/all")
     public List<Document> getAllDocument() {
         return documentService.getAllDocuments();
+    }
+
+    @PutMapping("/document/pending")
+    public ResponseEntity<?> setDocumentToPending(@RequestParam("resourceId") String documentId,
+                                                  @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Document document = documentService.getDocumentById(documentId);
+        
+        if (document == null) {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+
+        documentService.updateDocumentState(document, ResourceStatus.pending);
+        return new ResponseEntity<>("Document state updated to pending successfully", HttpStatus.OK);
     }
 }

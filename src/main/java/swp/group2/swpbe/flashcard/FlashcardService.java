@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.flashcard.dto.FlashcardDTO;
@@ -77,6 +78,12 @@ public class FlashcardService {
         return flashcards;
     }
 
+
+
+    public Flashcard getFlashcardById(int flashcardId) {
+        return flashcardRepository.findById(flashcardId);
+    }
+
     public void uploadReviewFlashcard(String flashcardId, String userId, ReviewState review) {
         Flashcard flashcard = flashcardRepository.findById(Integer.parseInt(flashcardId));
         FlashcardReview reviewExist = flashcardReviewRepository.findByFlashcardsAndUserId(flashcard, userId);
@@ -95,5 +102,10 @@ public class FlashcardService {
         FlashcardReview flashcardReview = new FlashcardReview(flashcard, userId, review);
         flashcardReviewRepository.save(flashcardReview);
 
+    }
+
+    public void updateFlashcardState(Flashcard flashcard, ResourceStatus state) {
+        flashcard.setState(state);
+        flashcardRepository.save(flashcard);
     }
 }
