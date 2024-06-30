@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import swp.group2.swpbe.AuthService;
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.flashcard.dto.FlashcardDTO;
 import swp.group2.swpbe.flashcard.entities.Flashcard;
@@ -56,4 +57,18 @@ public class FlashcardController {
         return new ResponseEntity<>("upload review successfully", HttpStatus.OK);
     }
 
+
+    @PutMapping("/flashcard/pending")
+    public ResponseEntity<?> setFlashcardToPending(@RequestParam("resourceId") String flashcardId,
+                                                   @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Flashcard flashcard = flashcardService.getFlashcardById(Integer.parseInt(flashcardId));
+        
+        if (flashcard == null) {
+            return new ResponseEntity<>("Flashcard not found", HttpStatus.NOT_FOUND);
+        }
+
+        flashcardService.updateFlashcardState(flashcard, ResourceStatus.pending);
+        return new ResponseEntity<>("Flashcard state updated to pending successfully", HttpStatus.OK);
+    }
 }

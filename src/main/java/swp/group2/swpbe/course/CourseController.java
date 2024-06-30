@@ -18,12 +18,14 @@ import swp.group2.swpbe.AuthService;
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.Common;
 import swp.group2.swpbe.constant.PaymentStatus;
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.course.dto.ReviewCourseDTO;
 import swp.group2.swpbe.course.entites.Course;
 import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.course.entites.Lesson;
 import swp.group2.swpbe.course.response.ExpertCourseResponse;
 import swp.group2.swpbe.course.response.StudentResponse;
+import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.exception.ApiRequestException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -208,4 +210,18 @@ public class CourseController {
         return new ResponseEntity<>("Review course successfully", HttpStatus.OK);
     }
 
+
+    @PutMapping("/course/pending")
+    public ResponseEntity<?> setCourseToPending(@RequestParam("resourceId") String courseId,
+                                                @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Course course = courseService.getCourseById(Integer.parseInt(courseId));
+        
+        if (course == null) {
+            return new ResponseEntity<>("Course not found", HttpStatus.NOT_FOUND);
+        }
+
+        courseService.updateCourseState(course, "pending");
+        return new ResponseEntity<>("Course state updated to pending successfully", HttpStatus.OK);
+    }
 }

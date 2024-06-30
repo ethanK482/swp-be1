@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.document.entities.DocumentReview;
@@ -59,6 +61,11 @@ public class DocumentService {
         }
         DocumentReview documentReview = new DocumentReview(review, userId, document);
         reviewRepository.save(documentReview);
+    }
+
+    public void updateDocumentState(Document document, ResourceStatus state) {
+        document.setState(state);
+        documentRepository.save(document);
     }
 
 }

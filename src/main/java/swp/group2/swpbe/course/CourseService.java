@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.constant.PaymentStatus;
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.course.dto.ReviewCourseDTO;
 import swp.group2.swpbe.course.entites.Course;
 import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.course.entites.CourseReview;
 import swp.group2.swpbe.course.entites.Lesson;
 import swp.group2.swpbe.course.response.StudentResponse;
+import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.user.UserRepository;
 import swp.group2.swpbe.user.entities.User;
@@ -186,4 +188,10 @@ public class CourseService {
                     lessonHandleArr[1]);
         }
     }
+
+    public void updateCourseState(Course course, String state) {
+        course.setState(state);
+        courseRepository.save(course);
+    }
+
 }
