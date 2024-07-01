@@ -4,6 +4,8 @@ import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.param.checkout.SessionCreateParams.Locale;
+
 import jakarta.servlet.http.HttpServletRequest;
 import swp.group2.swpbe.constant.PaymentStatus;
 import swp.group2.swpbe.course.CourseOrderRepository;
@@ -67,6 +69,7 @@ public class PaymentController {
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                     .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setLocale(Locale.EN)
                     .setSuccessUrl(allowedOrigins + "/payment/result?state=success")
                     .setCancelUrl(allowedOrigins + "/payment/result")
                     .addLineItem(
