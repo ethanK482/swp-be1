@@ -60,7 +60,7 @@ public class UserService {
         String full_name = user.getFull_name();
         String email = user.getEmail().toLowerCase();
         String password = bCryptPasswordEncoder.encode(user.getPassword());
-        if (userRepository.findByEmailAndSid(email, null) != null) {
+        if (userRepository.findByEmail(email) != null) {
             throw new ApiRequestException("Email already exist", HttpStatus.BAD_REQUEST);
         }
         try {
@@ -147,7 +147,7 @@ public class UserService {
     }
 
     public User saveSocialUser(LoginSocialDTO user) {
-        User userExist = userRepository.findBySid(user.getS_id());
+        User userExist = userRepository.findByEmail(user.getEmail());
         if (userExist != null) {
             return userExist;
         }
