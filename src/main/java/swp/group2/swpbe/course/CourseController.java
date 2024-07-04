@@ -224,4 +224,18 @@ public class CourseController {
         courseService.updateCourseState(course, "pending");
         return new ResponseEntity<>("Course state updated to pending successfully", HttpStatus.OK);
     }
+
+    @PutMapping("/course/active")
+    public ResponseEntity<?> setCourseToActive(@RequestParam("courseId") String courseId,
+                                                @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Course course = courseService.getCourseById(Integer.parseInt(courseId));
+        
+        if (course == null) {
+            return new ResponseEntity<>("Course not found", HttpStatus.NOT_FOUND);
+        }
+
+        courseService.updateCourseState(course, "active");
+        return new ResponseEntity<>("Course state updated to active successfully", HttpStatus.OK);
+    }
 }
