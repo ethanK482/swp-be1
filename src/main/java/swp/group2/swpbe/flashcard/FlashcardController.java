@@ -71,4 +71,18 @@ public class FlashcardController {
         flashcardService.updateFlashcardState(flashcard, ResourceStatus.pending);
         return new ResponseEntity<>("Flashcard state updated to pending successfully", HttpStatus.OK);
     }
+
+    @PutMapping("/flashcard/acitve")
+    public ResponseEntity<?> setFlashcardToActive(@RequestParam("flashcardId") String flashcardId,
+                                                   @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Flashcard flashcard = flashcardService.getFlashcardById(Integer.parseInt(flashcardId));
+        
+        if (flashcard == null) {
+            return new ResponseEntity<>("Flashcard not found", HttpStatus.NOT_FOUND);
+        }
+
+        flashcardService.updateFlashcardState(flashcard, ResourceStatus.active);
+        return new ResponseEntity<>("Flashcard state updated to pending successfully", HttpStatus.OK);
+    }
 }

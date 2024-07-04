@@ -78,4 +78,18 @@ public class DocumentController {
         documentService.updateDocumentState(document, ResourceStatus.pending);
         return new ResponseEntity<>("Document state updated to pending successfully", HttpStatus.OK);
     }
+
+    @PutMapping("/document/active")
+    public ResponseEntity<?> setDocumentToAcitve(@RequestParam("documentId") String documentId,
+                                                  @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        Document document = documentService.getDocumentById(documentId);
+        
+        if (document == null) {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+
+        documentService.updateDocumentState(document, ResourceStatus.active);
+        return new ResponseEntity<>("Document state updated to pending successfully", HttpStatus.OK);
+    }
 }
