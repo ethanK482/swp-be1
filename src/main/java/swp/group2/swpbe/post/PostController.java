@@ -58,14 +58,21 @@ public class PostController {
     }
 
     @DeleteMapping("/deletePost/{id}")
-    public boolean deletePost(@PathVariable("id") Integer id, @RequestHeader("Authorization") String token) {
-        authService.loginUser(token);
-        return postService.deletePost(id);
+    public ResponseEntity<?> deletePost(@PathVariable("id") Integer id, @RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        postService.deletePost(id, userId);
+        return ResponseEntity.ok("Delete post successfully");
     }
 
     @GetMapping("posts")
     public List<Post> getAllPost() {
         return postService.getAllPosts();
+    }
+
+    @GetMapping("myposts")
+    public List<Post> getMyPost(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        return postService.getMyPost(userId);
     }
 
     @PostMapping("/post/like")

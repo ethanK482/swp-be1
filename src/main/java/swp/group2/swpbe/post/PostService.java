@@ -36,31 +36,32 @@ public class PostService {
 		if (post == null) {
 			throw new ApiRequestException("Post not found", HttpStatus.BAD_REQUEST);
 		}
-		if (!post.getUser_id().equals(userId)) {
+		if (!post.getUserId().equals(userId)) {
 			throw new ApiRequestException("Unauthorized user", HttpStatus.UNAUTHORIZED);
 		}
-		post.setUpdated_at(new Date());
+		post.setUpdatedAt(new Date());
 		post.setContent(content);
 
 		if (url != null)
-			post.setFile_url(url);
+			post.setFileUrl(url);
 		postRepository.save(post);
 
 	}
 
-	public boolean deletePost(int id) {
-		if (id >= 1) {
-			Post post = postRepository.findById(id);
-			if (post != null) {
-				postRepository.delete(post);
-				return true;
-			}
+	public void deletePost(int id, String userId) {
+		Post post = postRepository.findByIdAndUserId(id, userId);
+		if (post == null) {
+			throw new ApiRequestException("Post not found", HttpStatus.BAD_REQUEST);
 		}
-		return false;
+		postRepository.delete(post);
 	}
 
 	public List<Post> getAllPosts() {
 		return postRepository.findAllByOrderByCreatedAtDesc();
+	}
+
+	public List<Post> getMyPost(String userId) {
+		return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 	}
 
 	public void uploadReview(Post post, String userId) {

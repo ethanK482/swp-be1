@@ -5,45 +5,47 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import swp.group2.swpbe.course.entites.Lesson;
 
 @Entity
 public class Post {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-
 	private int id;
-	private String file_url;
+	@Column(name = "file_url")
+	private String fileUrl;
 	@Column(name = "created_at")
 	private Date createdAt;
-	private Date updated_at;
-	private String user_id;
+	@Column(name = "updated_at")
+	private Date updatedAt;
+	@Column(name = "user_id")
+	private String userId;
 	private String content;
 
-	@OneToMany(mappedBy = "post")
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
 	@JsonManagedReference
 	private List<PostLike> likes;
 
-	@OneToMany(mappedBy = "post")
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
 	@JsonManagedReference
 	private List<Comments> comments;
 
-	public Post(String file_url, String user_id, String content) {
-		this.file_url = file_url;
-		this.createdAt = new Date();
-		this.updated_at = new Date();
-		this.user_id = user_id;
-		this.content = content;
+	public Post() {
 	}
 
-	public Post() {
+	public Post(String fileUrl, String userId, String content) {
+		this.fileUrl = fileUrl;
+		this.createdAt = new Date();
+		this.updatedAt = new Date();
+		this.userId = userId;
+		this.content = content;
 	}
 
 	public int getId() {
@@ -54,12 +56,12 @@ public class Post {
 		this.id = id;
 	}
 
-	public String getFile_url() {
-		return this.file_url;
+	public String getFileUrl() {
+		return this.fileUrl;
 	}
 
-	public void setFile_url(String file_url) {
-		this.file_url = file_url;
+	public void setFileUrl(String fileUrl) {
+		this.fileUrl = fileUrl;
 	}
 
 	public Date getCreatedAt() {
@@ -70,20 +72,20 @@ public class Post {
 		this.createdAt = createdAt;
 	}
 
-	public Date getUpdated_at() {
-		return this.updated_at;
+	public Date getUpdatedAt() {
+		return this.updatedAt;
 	}
 
-	public void setUpdated_at(Date updated_at) {
-		this.updated_at = updated_at;
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 
-	public String getUser_id() {
-		return this.user_id;
+	public String getUserId() {
+		return this.userId;
 	}
 
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getContent() {
@@ -92,6 +94,22 @@ public class Post {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public List<PostLike> getLikes() {
+		return this.likes;
+	}
+
+	public void setLikes(List<PostLike> likes) {
+		this.likes = likes;
+	}
+
+	public List<Comments> getComments() {
+		return this.comments;
+	}
+
+	public void setComments(List<Comments> comments) {
+		this.comments = comments;
 	}
 
 }
