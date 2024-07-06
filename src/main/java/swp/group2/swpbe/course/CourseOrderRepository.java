@@ -13,7 +13,9 @@ public interface CourseOrderRepository extends JpaRepository<CourseOrder, Intege
     List<CourseOrder> findByUserIdAndPaymentStatus(int userId, PaymentStatus paymentStatus);
 
     CourseOrder findByCourseIdAndUserId(int courseId, int userId);
-    List<CourseOrder> findByPaymentStatus(String paymentStatus);
+
+    List<CourseOrder> findByPaymentStatus(PaymentStatus paymentStatus);
+
     List<CourseOrder> findByCourseId(int courseId);
 
 }

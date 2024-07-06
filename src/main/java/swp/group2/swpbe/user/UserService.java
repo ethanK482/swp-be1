@@ -113,7 +113,7 @@ public class UserService {
             throw new ApiRequestException("Invalid token", HttpStatus.BAD_REQUEST);
         }
         User user = userRepository.findByEmailAndSid(email, null);
-        user.setIsVerifyEmail(1);
+        user.setState(1);
         user.setUpdatedAt(new Date());
         return userRepository.save(user);
     }
@@ -149,6 +149,9 @@ public class UserService {
     public User saveSocialUser(LoginSocialDTO user) {
         User userExist = userRepository.findByEmail(user.getEmail());
         if (userExist != null) {
+            if (userExist.getState() == -1) {
+                throw new ApiRequestException("Your account is blocked", HttpStatus.BAD_REQUEST);
+            }
             return userExist;
         }
         userRepository.save(
@@ -163,8 +166,11 @@ public class UserService {
         if (user == null) {
             throw new ApiRequestException("Email not found", HttpStatus.BAD_REQUEST);
         }
-        if (user.getIsVerifyEmail() == 0) {
+        if (user.getState() == 0) {
             throw new ApiRequestException("not_verify_yet", HttpStatus.BAD_REQUEST);
+        }
+        if (user.getState() == -1) {
+            throw new ApiRequestException("Your account is blocked", HttpStatus.BAD_REQUEST);
         }
         String password = body.getPassword();
         boolean isCorrectPassword = bCryptPasswordEncoder.matches(password, user.getPassword());
@@ -206,7 +212,7 @@ public class UserService {
         User user = userRepository.findById(Integer.parseInt(id));
         Wallet userWallet = walletRepository.findByUserId(user.getId());
         UserProfileResponse response = new UserProfileResponse(user.getFullName(), user.getEmail(), "",
-                user.getAvatarUrl(), user.getIsVerifyEmail(), "", this.getUserLegit(id));
+                user.getAvatarUrl(), user.getState(), "", this.getUserLegit(id));
         response.setAbout(user.getAbout());
         response.setDob(user.getDob());
         response.setGender(user.getGender());
@@ -265,6 +271,12 @@ public class UserService {
 
     public List<User> getAllUser() {
         return userRepository.findAll();
+    }
+
+    public void updateUserState(int userId, int userState) {
+        User user = userRepository.findById(userId);
+        user.setState(userState);
+        userRepository.save(user);
     }
 
     public String getResetPasswordMailTemplate(String message, String buttonTitle, String email) {

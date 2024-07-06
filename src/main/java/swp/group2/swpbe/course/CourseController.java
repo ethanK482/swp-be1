@@ -25,7 +25,6 @@ import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.course.entites.Lesson;
 import swp.group2.swpbe.course.response.ExpertCourseResponse;
 import swp.group2.swpbe.course.response.StudentResponse;
-import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.exception.ApiRequestException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -119,25 +118,25 @@ public class CourseController {
     public List<ExpertCourseResponse> getExpertCourses(
             @RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
-        if (authService.isExpert(userId) == false) {
+        if (!authService.isExpert(userId)) {
             throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
         }
         List<Course> courses = courseService.getExpertCourse(userId);
-        List<ExpertCourseResponse> coursesResponses = new ArrayList<ExpertCourseResponse>();
+        List<ExpertCourseResponse> coursesResponses = new ArrayList<>();
         for (int i = 0; i < courses.size(); i++) {
             Course courseI = courses.get(i);
             List<Lesson> sortedLessons = courseI.getLessons();
-            sortedLessons.sort(Comparator.comparingInt(Lesson::getLesson_order));
+            sortedLessons.sort(Comparator.comparingInt(Lesson::getLessonOrder));
             List<CourseOrder> orders = courseOrderRepository.findByCourseIdAndPaymentStatus(courseI.getId(),
                     PaymentStatus.paid);
             int totalOrder = orders.size();
             Double income = Common.calculateExpertAmount(courseI.getPrice()) * totalOrder;
             ExpertCourseResponse courseResponse = new ExpertCourseResponse(totalOrder, income, courseI.getExpertId(),
-                    courseI.getPrice(), courseI.getDescription(), courseI.getBanner_url(), courseI.getName(),
+                    courseI.getPrice(), courseI.getDescription(), courseI.getBannerUrl(), courseI.getName(),
                     courseI.getTopicId(), courseI.getState());
             courseResponse.setId(courseI.getId());
-            courseResponse.setCreated_at(courseI.getCreated_at());
-            courseResponse.setCreated_at(courseI.getUpdated_at());
+            courseResponse.setCreatedAt(courseI.getCreatedAt());
+            courseResponse.setCreatedAt(courseI.getUpdatedAt());
             courseResponse.setLessons(sortedLessons);
             coursesResponses.add(courseResponse);
 
@@ -161,10 +160,10 @@ public class CourseController {
 
         for (Course course : courses) {
             List<Lesson> sortedLessons = course.getLessons();
-            sortedLessons.sort(Comparator.comparingInt(Lesson::getLesson_order));
+            sortedLessons.sort(Comparator.comparingInt(Lesson::getLessonOrder));
             for (int i = 0; i < sortedLessons.size(); i++) {
                 if (i != 0) {
-                    sortedLessons.get(i).setVideo_url("");
+                    sortedLessons.get(i).setVideoUrl("");
                 }
             }
         }
@@ -175,10 +174,20 @@ public class CourseController {
     public List<StudentResponse> getOrderHistories(@RequestHeader("Authorization") String token,
             @RequestParam(name = "courseId") int courseId) {
         String userId = authService.loginUser(token);
-        if (authService.isExpert(userId) == false) {
+        if (!authService.isExpert(userId)) {
             throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
         }
         return courseService.getCourseStudent(courseId, userId);
+    }
+
+    @GetMapping("course/pending")
+    public List<Course> getOrderHistories(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        return courseService.getAllPendingCourse();
     }
 
     @PutMapping("admin/course/{id}")
@@ -210,32 +219,21 @@ public class CourseController {
         return new ResponseEntity<>("Review course successfully", HttpStatus.OK);
     }
 
-
-    @PutMapping("/course/pending")
-    public ResponseEntity<?> setCourseToPending(@RequestParam("resourceId") String courseId,
-                                                @RequestHeader("Authorization") String token) {
+    @PutMapping("/course/active/{id}")
+    public ResponseEntity<?> setCourseToActive(@PathVariable int id,
+            @RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
-        Course course = courseService.getCourseById(Integer.parseInt(courseId));
-        
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        Course course = courseService.getCourseById(id);
+
         if (course == null) {
             return new ResponseEntity<>("Course not found", HttpStatus.NOT_FOUND);
         }
 
-        courseService.updateCourseState(course, "pending");
-        return new ResponseEntity<>("Course state updated to pending successfully", HttpStatus.OK);
-    }
-
-    @PutMapping("/course/active")
-    public ResponseEntity<?> setCourseToActive(@RequestParam("courseId") String courseId,
-                                                @RequestHeader("Authorization") String token) {
-        String userId = authService.loginUser(token);
-        Course course = courseService.getCourseById(Integer.parseInt(courseId));
-        
-        if (course == null) {
-            return new ResponseEntity<>("Course not found", HttpStatus.NOT_FOUND);
-        }
-
-        courseService.updateCourseState(course, "active");
+        courseService.updateCourseState(course, ResourceStatus.active);
         return new ResponseEntity<>("Course state updated to active successfully", HttpStatus.OK);
     }
+
 }

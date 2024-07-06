@@ -2,6 +2,7 @@ package swp.group2.swpbe.course.entites;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,23 +15,24 @@ public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String video_url;
-    private int lesson_order;
+    @Column(name = "video_url")
+    private String videoUrl;
+    @Column(name = "lesson_order")
+    private int lessonOrder;
     private String name;
     @ManyToOne
     @JoinColumn(name = "course_id")
-     @JsonBackReference
+    @JsonBackReference
     private Course course;
 
     public Lesson() {
     }
 
-    public Lesson(String video_url, int lesson_order, String name) {
-        this.video_url = video_url;
-        this.lesson_order = lesson_order;
+    public Lesson(String videoUrl, int lessonOrder, String name) {
+        this.videoUrl = videoUrl;
+        this.lessonOrder = lessonOrder;
         this.name = name;
     }
-
 
     public int getId() {
         return this.id;
@@ -40,20 +42,20 @@ public class Lesson {
         this.id = id;
     }
 
-    public String getVideo_url() {
-        return this.video_url;
+    public String getVideoUrl() {
+        return this.videoUrl;
     }
 
-    public void setVideo_url(String video_url) {
-        this.video_url = video_url;
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
-    public int getLesson_order() {
-        return this.lesson_order;
+    public int getLessonOrder() {
+        return this.lessonOrder;
     }
 
-    public void setLesson_order(int lesson_order) {
-        this.lesson_order = lesson_order;
+    public void setLessonOrder(int lessonOrder) {
+        this.lessonOrder = lessonOrder;
     }
 
     public String getName() {
@@ -71,6 +73,5 @@ public class Lesson {
     public void setCourse(Course course) {
         this.course = course;
     }
-   
 
 }

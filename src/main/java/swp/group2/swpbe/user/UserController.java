@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 public class UserController {
@@ -55,8 +56,7 @@ public class UserController {
     public LoginResponse loginSocial(@RequestBody LoginSocialDTO body) {
         User user = userService.saveSocialUser(body);
         String token = jwtTokenProvider.generateAccessToken(user.getId() + "");
-        LoginResponse response = new LoginResponse(token, user.getRole());
-        return response;
+        return new LoginResponse(token, user.getRole());
     }
 
     @PostMapping("/reset-password")
@@ -87,8 +87,7 @@ public class UserController {
     public LoginResponse login(@RequestBody LoginDTO body) {
         User user = userService.login(body);
         String token = jwtTokenProvider.generateAccessToken(user.getId() + "");
-        LoginResponse response = new LoginResponse(token, user.getRole());
-        return response;
+        return new LoginResponse(token, user.getRole());
     }
 
     @PatchMapping("/change-password")
@@ -101,8 +100,7 @@ public class UserController {
     @GetMapping("/profile")
     public User getProfile(@RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
-        User user = userService.getUserProfile(userId);
-        return user;
+        return userService.getUserProfile(userId);
     }
 
     @PatchMapping("/update-password")
@@ -141,4 +139,14 @@ public class UserController {
         return userService.getAllUser();
     }
 
+    @PutMapping("user/state/{id}")
+    public ResponseEntity<?> putMethodName(@PathVariable int id, @RequestHeader("Authorization") String token,
+            @RequestBody int state) {
+        String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        userService.updateUserState(id, state);
+        return new ResponseEntity<>("update state successfully", HttpStatus.OK);
+    }
 }

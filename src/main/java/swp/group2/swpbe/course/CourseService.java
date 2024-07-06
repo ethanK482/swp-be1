@@ -42,44 +42,44 @@ public class CourseService {
 
     public Course createCourse(String expert_id, Double price, String description, String name, String banner_url,
             String topic_id) {
-        Course course = new Course(expert_id, price, description, banner_url, name, topic_id, "pending");
+        Course course = new Course(expert_id, price, description, banner_url, name, topic_id, ResourceStatus.pending);
         return courseRepository.save(course);
 
     }
 
-    public Course updateCourse(int course_id, String expert_id, Double price, String description, String name,
-            String topic_id, String bannerUrl) {
-        Course course = courseRepository.findById(course_id);
+    public Course updateCourse(int courseId, String expertId, Double price, String description, String name,
+            String topicId, String bannerUrl) {
+        Course course = courseRepository.findById(courseId);
         if (course == null) {
             throw new ApiRequestException("Course not found", HttpStatus.BAD_REQUEST);
         }
         if (bannerUrl != null) {
-            course.setBanner_url(bannerUrl);
+            course.setBannerUrl(bannerUrl);
         }
-        course.setExpertId(expert_id);
+        course.setExpertId(expertId);
         course.setPrice(price);
         course.setDescription(description);
         course.setName(name);
-        course.setTopicId(topic_id);
-        course.setUpdated_at(new Date());
+        course.setTopicId(topicId);
+        course.setUpdatedAt(new Date());
 
         return courseRepository.save(course);
 
     }
 
-    public Course updateCourseBanner(int course_id, String banner_url) {
-        Course course = courseRepository.findById(course_id);
+    public Course updateCourseBanner(int courseId, String bannerUrl) {
+        Course course = courseRepository.findById(courseId);
         if (course == null) {
             throw new ApiRequestException("Course not found", HttpStatus.BAD_REQUEST);
         }
-        course.setBanner_url(banner_url);
-        course.setUpdated_at(new Date());
+        course.setBannerUrl(bannerUrl);
+        course.setUpdatedAt(new Date());
         return courseRepository.save(course);
 
     }
 
-    public void createLesson(Course course, String video_url, int order, String name) {
-        Lesson lesson = new Lesson(video_url, order, name);
+    public void createLesson(Course course, String videoUrl, int order, String name) {
+        Lesson lesson = new Lesson(videoUrl, order, name);
         lesson.setCourse(course);
         lessonRepository.save(lesson);
     }
@@ -87,23 +87,21 @@ public class CourseService {
     public Lesson updateLesson(int lessonId, String videoUrl, int order, String name) {
         Lesson lesson = lessonRepository.findById(lessonId);
         lesson.setName(name);
-        lesson.setVideo_url(videoUrl);
-        lesson.setLesson_order(order);
+        lesson.setVideoUrl(videoUrl);
+        lesson.setLessonOrder(order);
         return lessonRepository.save(lesson);
     }
 
     public List<Course> getExpertCourse(String expertId) {
-        List<Course> courses = courseRepository.findByExpertId(expertId);
-        return courses;
+        return courseRepository.findByExpertId(expertId);
     }
 
     public List<Course> getAllCourse() {
-        List<Course> courses = courseRepository.findAll();
-        return courses;
+        return courseRepository.findAll();
     }
 
     public List<Course> getAllActiveCourse() {
-        List<Course> courses = courseRepository.findByState("active");
+        List<Course> courses = courseRepository.findByState(ResourceStatus.active);
         Collections.sort(courses, new Comparator<Course>() {
             @Override
             public int compare(Course o1, Course o2) {
@@ -121,7 +119,7 @@ public class CourseService {
 
     public Course acceptCourse(int id) {
         Course course = courseRepository.findById(id);
-        course.setState("active");
+        course.setState(ResourceStatus.active);
         return courseRepository.save(course);
     }
 
@@ -138,7 +136,7 @@ public class CourseService {
     }
 
     public List<CourseOrder> getPaidOrders() {
-        return courseOrderRepository.findByPaymentStatus("paid");
+        return courseOrderRepository.findByPaymentStatus(PaymentStatus.paid);
     }
 
     public void createReview(ReviewCourseDTO body, int userId) {
@@ -189,9 +187,13 @@ public class CourseService {
         }
     }
 
-    public void updateCourseState(Course course, String state) {
+    public void updateCourseState(Course course, ResourceStatus state) {
         course.setState(state);
         courseRepository.save(course);
+    }
+
+    public List<Course> getAllPendingCourse() {
+        return courseRepository.findByState(ResourceStatus.pending);
     }
 
 }

@@ -2,7 +2,6 @@ package swp.group2.swpbe.report.entities;
 
 import java.util.Date;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import swp.group2.swpbe.constant.ResourceType;
 
-
 @Entity
 public class Report {
     @Id
@@ -21,18 +19,17 @@ public class Report {
     @Column(name = "user_id")
     private String userId;
 
-    @Enumerated(EnumType.STRING) 
+    @Enumerated(EnumType.STRING)
     @Column(name = "resource_type")
-    private ResourceType resourceType ;
+    private ResourceType resourceType;
 
     @Column(name = "resource_id")
     private String resourceId;
 
     private String reason;
-    
+
     @Column(name = "report_date")
     private Date reportDate;
-
 
     public Report() {
     }
@@ -92,6 +89,5 @@ public class Report {
     public void setReportDate(Date reportDate) {
         this.reportDate = reportDate;
     }
-
 
 }

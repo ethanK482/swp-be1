@@ -19,6 +19,7 @@ import swp.group2.swpbe.JwtTokenProvider;
 import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.constant.ReviewState;
 import swp.group2.swpbe.document.entities.Document;
+import swp.group2.swpbe.exception.ApiRequestException;
 
 @RestController
 public class DocumentController {
@@ -65,26 +66,15 @@ public class DocumentController {
         return documentService.getAllDocuments();
     }
 
-    @PutMapping("/document/pending")
-    public ResponseEntity<?> setDocumentToPending(@RequestParam("resourceId") String documentId,
-                                                  @RequestHeader("Authorization") String token) {
-        String userId = authService.loginUser(token);
-        Document document = documentService.getDocumentById(documentId);
-        
-        if (document == null) {
-            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-        }
-
-        documentService.updateDocumentState(document, ResourceStatus.pending);
-        return new ResponseEntity<>("Document state updated to pending successfully", HttpStatus.OK);
-    }
-
     @PutMapping("/document/active")
     public ResponseEntity<?> setDocumentToAcitve(@RequestParam("documentId") String documentId,
-                                                  @RequestHeader("Authorization") String token) {
+            @RequestHeader("Authorization") String token) {
         String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
         Document document = documentService.getDocumentById(documentId);
-        
+
         if (document == null) {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }

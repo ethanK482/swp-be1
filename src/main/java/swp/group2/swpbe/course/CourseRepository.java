@@ -1,5 +1,6 @@
 package swp.group2.swpbe.course;
 
+import swp.group2.swpbe.constant.ResourceStatus;
 import swp.group2.swpbe.course.entites.Course;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
      List<Course> findByExpertId(String expertId);
 
-     List<Course> findByState(String state);
+     List<Course> findByState(ResourceStatus state);
 
      Course findByIdAndExpertId(int courseId, String expertId);
 

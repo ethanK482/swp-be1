@@ -6,10 +6,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import swp.group2.swpbe.constant.ResourceStatus;
 
 @Entity
 public class Course {
@@ -19,10 +22,13 @@ public class Course {
     @Column(name = "expert_id")
     private String expertId;
     private Double price;
-    private Date created_at;
-    private Date updated_at;
+    @Column(name = "created_at")
+    private Date createdAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
     private String description;
-    private String banner_url;
+    @Column(name = "banner_url")
+    private String bannerUrl;
     private String name;
     @OneToMany(mappedBy = "course")
     @JsonManagedReference
@@ -35,23 +41,24 @@ public class Course {
     private List<CourseReview> reviews;
     @Column(name = "topic_id")
     private String topicId;
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private ResourceStatus state;
 
     public Course() {
     }
 
-    public Course(String expertId, Double price, String description, String banner_url, String name, String topicId, String state) {
+    public Course(String expertId, Double price, String description, String bannerUrl, String name, String topicId,
+            ResourceStatus state) {
         this.expertId = expertId;
         this.price = price;
-        this.created_at = new Date();
-        this.updated_at = new Date();
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
         this.description = description;
-        this.banner_url = banner_url;
+        this.bannerUrl = bannerUrl;
         this.name = name;
         this.topicId = topicId;
         this.state = state;
     }
-
 
     public int getId() {
         return this.id;
@@ -77,20 +84,20 @@ public class Course {
         this.price = price;
     }
 
-    public Date getCreated_at() {
-        return this.created_at;
+    public Date getCreatedAt() {
+        return this.createdAt;
     }
 
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Date getUpdated_at() {
-        return this.updated_at;
+    public Date getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getDescription() {
@@ -101,12 +108,12 @@ public class Course {
         this.description = description;
     }
 
-    public String getBanner_url() {
-        return this.banner_url;
+    public String getBannerUrl() {
+        return this.bannerUrl;
     }
 
-    public void setBanner_url(String banner_url) {
-        this.banner_url = banner_url;
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
     }
 
     public String getName() {
@@ -121,24 +128,8 @@ public class Course {
         return this.lessons;
     }
 
-    public void setLessons(List<Lesson> object) {
-        this.lessons = object;
-    }
-
-    public String getTopicId() {
-        return this.topicId;
-    }
-
-    public void setTopicId(String topicId) {
-        this.topicId = topicId;
-    }
-
-    public String getState() {
-        return this.state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
     }
 
     public List<CourseOrder> getOrders() {
@@ -157,6 +148,20 @@ public class Course {
         this.reviews = reviews;
     }
 
+    public String getTopicId() {
+        return this.topicId;
+    }
 
-  
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
+    }
+
+    public ResourceStatus getState() {
+        return this.state;
+    }
+
+    public void setState(ResourceStatus state) {
+        this.state = state;
+    }
+
 }

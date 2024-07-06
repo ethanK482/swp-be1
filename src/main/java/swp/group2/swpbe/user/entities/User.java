@@ -17,9 +17,8 @@ public class User {
     private String fullName;
     private String email;
     private String password;
-    @Column(name = "is_verify_email")
-    private int isVerifyEmail;
-      @Enumerated(EnumType.STRING) 
+    private int state;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -31,10 +30,10 @@ public class User {
     private Date dob;
     private String gender;
 
-    public User(String fullName, String email, String password, String avatarUrl, int isVerifyEmail, String sid) {
+    public User(String fullName, String email, String password, String avatarUrl, int state, String sid) {
         this.fullName = fullName;
         this.email = email;
-        this.isVerifyEmail = isVerifyEmail;
+        this.state = state;
         this.role = UserRole.USER;
         this.avatarUrl = avatarUrl;
         this.createdAt = new Date();
@@ -89,12 +88,12 @@ public class User {
         this.password = password;
     }
 
-    public int getIsVerifyEmail() {
-        return this.isVerifyEmail;
+    public int getState() {
+        return this.state;
     }
 
-    public void setIsVerifyEmail(int isVerifyEmail) {
-        this.isVerifyEmail = isVerifyEmail;
+    public void setState(int state) {
+        this.state = state;
     }
 
     public UserRole getRole() {

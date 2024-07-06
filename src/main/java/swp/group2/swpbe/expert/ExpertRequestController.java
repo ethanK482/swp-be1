@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import swp.group2.swpbe.AuthService;
-
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.expert.entities.ExpertRequest;
 import swp.group2.swpbe.user.UserService;
@@ -40,9 +38,8 @@ public class ExpertRequestController {
     }
 
     @GetMapping("/getexpert")
-    public List<ExpertRequest> getExpertRequest(@RequestBody Map body) {
-        List<ExpertRequest> expertRequest = expertRequestService.getAllExpert();
-        return expertRequest;
+    public List<ExpertRequest> getExpertRequest() {
+        return expertRequestService.getAllExpert();
 
     }
 }
