@@ -2,6 +2,8 @@ package swp.group2.swpbe.expert.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,7 @@ public class ExpertRequest {
     private String cvUrl;
     @Column(name = "created_at")
     private Date createdAt;
+    @Enumerated(EnumType.STRING)
     private ExpertRequestStatus state;
 
     public ExpertRequest(int id, String userId, String cvUrl, Date createdAt, ExpertRequestStatus state) {

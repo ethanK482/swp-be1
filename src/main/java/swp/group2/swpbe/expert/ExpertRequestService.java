@@ -70,6 +70,7 @@ public class ExpertRequestService {
         int userId = Integer.parseInt(expertRequest.getUserId());
 
         User user = userRepository.findById(userId);
+        String accountId = "";
         AccountCreateParams params = AccountCreateParams.builder()
                 .setType(AccountCreateParams.Type.EXPRESS)
                 .setCountry("US")
@@ -77,14 +78,15 @@ public class ExpertRequestService {
                 .build();
         try {
             Account account = Account.create(params);
-            Wallet wallet = new Wallet(userId, account.getId());
+            accountId = account.getId();
+            Wallet wallet = new Wallet(userId, accountId);
             walletRepository.save(wallet);
         } catch (StripeException e) {
             throw new ApiRequestException("Can't create account", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         AccountLinkCreateParams paramsLink = AccountLinkCreateParams.builder()
-                .setAccount("acct_1PZQtEFgLWdc1QCg")
+                .setAccount(accountId)
                 .setRefreshUrl("https://example.com/reauth")
                 .setReturnUrl("https://example.com/return")
                 .setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
@@ -93,8 +95,9 @@ public class ExpertRequestService {
             AccountLink accountLink = AccountLink.create(paramsLink);
             try {
                 this.sendMail(user.getEmail(), "Completed your wallet information",
-                        "Click here to complete your wallet information" + accountLink.getUrl());
+                        "Click here to complete your wallet information" + " " + accountLink.getUrl());
                 expertRequest.setState(ExpertRequestStatus.ACCEPTED);
+                expertRequestRepository.save(expertRequest);
             } catch (MessagingException e) {
                 throw new ApiRequestException("Can't send mail", HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -106,6 +109,7 @@ public class ExpertRequestService {
     public void rejectExpertRequest(int id) {
         ExpertRequest expertRequest = expertRequestRepository.findById(id);
         expertRequest.setState(ExpertRequestStatus.REJECTED);
+        expertRequestRepository.save(expertRequest);
     }
 
     public void sendMail(
