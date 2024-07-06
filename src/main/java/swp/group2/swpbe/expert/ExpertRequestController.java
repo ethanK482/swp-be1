@@ -9,9 +9,7 @@ import swp.group2.swpbe.AuthService;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.expert.entities.ExpertRequest;
 import swp.group2.swpbe.user.UserService;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class ExpertRequestController {
@@ -22,10 +20,10 @@ public class ExpertRequestController {
     @Autowired
     UserService userService;
 
-    @PostMapping("expert-requests")
+    @PostMapping("expert-request")
     public ResponseEntity<?> createExpertRequest(
             @RequestHeader("Authorization") String token,
-            @RequestParam("cv") MultipartFile file) throws IOException {
+            @RequestParam("cv") MultipartFile file) {
         String userId = authService.loginUser(token);
         boolean isAllowRequest = userService.getUserLegit(userId) > 200;
         if (isAllowRequest) {
@@ -37,9 +35,41 @@ public class ExpertRequestController {
         return new ResponseEntity<>("request sent successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/getexpert")
-    public List<ExpertRequest> getExpertRequest() {
+    @GetMapping("/expert-requests/all")
+    public List<ExpertRequest> getExpertRequest(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
         return expertRequestService.getAllExpert();
+    }
+
+    @GetMapping("/expert-requests/own")
+    public List<ExpertRequest> getOwnRequest(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        return expertRequestService.getOwnExpertRequests(userId);
+    }
+
+    @PutMapping("expert-request/accept/{id}")
+    public ResponseEntity<?> acceptExpertRequest(@RequestHeader("Authorization") String token, @PathVariable int id) {
+        String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        expertRequestService.acceptExpertRequest(id);
+        return new ResponseEntity<>("Successfully", HttpStatus.OK);
 
     }
+
+    @PutMapping("expert-request/reject/{id}")
+    public ResponseEntity<?> rejectExpertRequest(@RequestHeader("Authorization") String token, @PathVariable int id) {
+        String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+        expertRequestService.rejectExpertRequest(id);
+        return new ResponseEntity<>("Successfully", HttpStatus.OK);
+
+    }
+
 }

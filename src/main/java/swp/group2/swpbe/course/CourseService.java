@@ -20,7 +20,6 @@ import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.course.entites.CourseReview;
 import swp.group2.swpbe.course.entites.Lesson;
 import swp.group2.swpbe.course.response.StudentResponse;
-import swp.group2.swpbe.document.entities.Document;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.user.UserRepository;
 import swp.group2.swpbe.user.entities.User;

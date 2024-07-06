@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import swp.group2.swpbe.constant.ExpertRequestStatus;
 
 import java.util.Date;
 
@@ -15,20 +16,31 @@ public class ExpertRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
     @Column(name = "user_id")
     private String userId;
     @Column(name = "cv_url")
     private String cvUrl;
     @Column(name = "created_at")
     private Date createdAt;
-    private String state;
+    private ExpertRequestStatus state;
 
-    public String getId() {
+    public ExpertRequest(int id, String userId, String cvUrl, Date createdAt, ExpertRequestStatus state) {
+        this.id = id;
+        this.userId = userId;
+        this.cvUrl = cvUrl;
+        this.createdAt = createdAt;
+        this.state = state;
+    }
+
+    public ExpertRequest() {
+    }
+
+    public int getId() {
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -48,11 +60,11 @@ public class ExpertRequest {
         this.cvUrl = cvUrl;
     }
 
-    public String getState() {
+    public ExpertRequestStatus getState() {
         return this.state;
     }
 
-    public void setState(String state) {
+    public void setState(ExpertRequestStatus state) {
         this.state = state;
     }
 

@@ -3,6 +3,11 @@ package swp.group2.swpbe;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
+import com.stripe.param.AccountCreateParams;
+import com.stripe.param.AccountLinkCreateParams;
+import com.stripe.param.AccountUpdateParams;
+import com.stripe.param.TransferCreateParams;
+import com.stripe.param.AccountUpdateParams.Capabilities.Transfers;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams.Locale;
 
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.stripe.model.Event;
+import com.stripe.model.Transfer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 
@@ -94,6 +100,30 @@ public class PaymentController {
         }
     }
 
+    @PostMapping("/transfer")
+    public ResponseEntity<?> paymentResult(@RequestBody int userId, @RequestBody long amount) {
+        Stripe.apiKey = stripeApiKey;
+        Wallet wallet = walletRepository.findByUserId(userId);
+        if (wallet == null) {
+            throw new ApiRequestException("Wallet not found", HttpStatus.BAD_REQUEST);
+        }
+        TransferCreateParams params = TransferCreateParams.builder()
+                .setAmount(amount)
+                .setCurrency("vnd")
+                .setDestination(wallet.getAccountId())
+                .setTransferGroup("ORDER_95")
+                .build();
+
+        Transfer transfer;
+        try {
+            transfer = Transfer.create(params);
+            return new ResponseEntity<>("Withdraw successfully", HttpStatus.OK);
+        } catch (StripeException e) {
+            throw new ApiRequestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhookEvent(
             @RequestBody String payload, HttpServletRequest request) {
@@ -118,16 +148,12 @@ public class PaymentController {
                 courseOrderRepository.save(order);
                 if (PaymentStatus.paid.equals(order.getPaymentStatus())) {
                     Wallet wallet = walletRepository.findByUserId(expertId);
-                    if (wallet == null) {
-                        Wallet newWallet = new Wallet(expertId, expertAmount);
-                        walletRepository.save(newWallet);
-                    } else {
+                    if (wallet != null) {
                         wallet.setBalance(wallet.getBalance() + expertAmount);
                         walletRepository.save(wallet);
                     }
                 }
             }
-
         } catch (SignatureVerificationException e) {
             e.printStackTrace();
         }

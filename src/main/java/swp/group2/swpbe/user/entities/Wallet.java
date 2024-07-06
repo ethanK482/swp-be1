@@ -17,15 +17,17 @@ public class Wallet {
     private Double balance;
     @Column(name = "is_locked")
     private int isLocked;
+    @Column(name = "account_id")
+    private String accountId;
 
     public Wallet() {
     }
 
-
-    public Wallet( int userId, Double balance) {
+    public Wallet(int userId, String accountId) {
         this.userId = userId;
-        this.balance = balance;
+        this.balance = 0.0;
         this.isLocked = 0;
+        this.accountId = accountId;
     }
 
     public int getId() {
@@ -60,7 +62,12 @@ public class Wallet {
         this.isLocked = isLocked;
     }
 
+    public String getAccountId() {
+        return this.accountId;
+    }
 
-
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
 
 }
