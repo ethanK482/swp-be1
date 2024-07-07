@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import swp.group2.swpbe.expert.entities.ExpertRequest;
 
 @Repository
-public interface ExpertRequestRepository extends JpaRepository<ExpertRequest, String> {
+public interface ExpertRequestRepository extends JpaRepository<ExpertRequest, Integer> {
 
     ExpertRequest findById(int id);
 

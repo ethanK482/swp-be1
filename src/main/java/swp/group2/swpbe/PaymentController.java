@@ -19,7 +19,10 @@ import swp.group2.swpbe.course.entites.Course;
 import swp.group2.swpbe.course.entites.CourseOrder;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.user.WalletRepository;
+import swp.group2.swpbe.user.WithdrawRepository;
 import swp.group2.swpbe.user.entities.Wallet;
+import swp.group2.swpbe.user.entities.Withdraw;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +48,8 @@ public class PaymentController {
     CourseRepository courseRepository;
     @Autowired
     CourseOrderRepository courseOrderRepository;
+    @Autowired
+    WithdrawRepository withdrawRepository;
 
     @Value("${allow.origin}")
     private String allowedOrigins;
@@ -67,7 +72,7 @@ public class PaymentController {
         try {
             Stripe.apiKey = stripeApiKey;
             Course course = courseRepository.findById(Integer.parseInt(courseId));
-            String currency = "vnd";
+            String currency = "usd";
             Map<String, String> metadata = new HashMap<>();
             metadata.put("courseId", courseId + "");
             metadata.put("userId", userId);
@@ -84,7 +89,7 @@ public class PaymentController {
                                     .setPriceData(
                                             SessionCreateParams.LineItem.PriceData.builder()
                                                     .setCurrency(currency)
-                                                    .setUnitAmountDecimal(BigDecimal.valueOf(course.getPrice()))
+                                                    .setUnitAmount((long) (course.getPrice() * 100))
                                                     .setProductData(
                                                             SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                                     .setName(course.getName())
@@ -96,32 +101,42 @@ public class PaymentController {
             Session session = Session.create(params);
             return session.getUrl();
         } catch (StripeException e) {
+            e.printStackTrace();
             throw new ApiRequestException("FAILED", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<?> paymentResult(@RequestBody int userId, @RequestBody long amount) {
+    public ResponseEntity<?> paymentResult(@RequestHeader("Authorization") String token, @RequestBody double amount) {
         Stripe.apiKey = stripeApiKey;
-        Wallet wallet = walletRepository.findByUserId(userId);
+        String userId = authService.loginUser(token);
+        Wallet wallet = walletRepository.findByUserId(Integer.parseInt(userId));
         if (wallet == null) {
             throw new ApiRequestException("Wallet not found", HttpStatus.BAD_REQUEST);
         }
+        long amountInSmallestUnit = (long) amount;
+        if (wallet.getBalance() < amountInSmallestUnit) {
+            throw new ApiRequestException("Not enough balance", HttpStatus.BAD_REQUEST);
+        }
+
         TransferCreateParams params = TransferCreateParams.builder()
-                .setAmount(amount)
-                .setCurrency("vnd")
+                .setAmount(amountInSmallestUnit * 100)
+                .setCurrency("usd")
                 .setDestination(wallet.getAccountId())
                 .setTransferGroup("ORDER_95")
                 .build();
-
-        Transfer transfer;
         try {
-            transfer = Transfer.create(params);
+            Transfer transfer = Transfer.create(params);
+            wallet.setBalance(wallet.getBalance() - amountInSmallestUnit);
+            walletRepository.save(wallet);
+
+            Withdraw withdraw = new Withdraw(userId + "", amountInSmallestUnit, transfer.getId());
+            withdrawRepository.save(withdraw);
             return new ResponseEntity<>("Withdraw successfully", HttpStatus.OK);
         } catch (StripeException e) {
+            e.printStackTrace();
             throw new ApiRequestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @PostMapping("/webhook")
@@ -140,7 +155,7 @@ public class PaymentController {
                 String courseId = session.getMetadata().get("courseId");
                 int expertId = Integer.parseInt(session.getMetadata().get("expertId"));
                 PaymentStatus paymentStatus = PaymentStatus.valueOf(session.getPaymentStatus());
-                Double amount = (double) session.getAmountTotal();
+                Double amount = (double) session.getAmountTotal() / 100;
                 Double expertAmount = Common.calculateExpertAmount(amount);
                 Course course = courseRepository.findById(Integer.parseInt(courseId));
                 CourseOrder order = new CourseOrder(course, userId, paymentStatus,

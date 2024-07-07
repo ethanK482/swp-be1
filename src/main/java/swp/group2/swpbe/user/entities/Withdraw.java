@@ -1,5 +1,7 @@
 package swp.group2.swpbe.user.entities;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,20 +16,19 @@ public class Withdraw {
     @Column(name = "user_id")
     private String userId;
     @Column(name = "amount")
-    private String amount;
+    private double amount;
     @Column(name = "created_at")
-    private String createdAt;
+    private Date createdAt;
     @Column(name = "transaction_id")
     private String transactionId;
 
     public Withdraw() {
     }
 
-    public Withdraw(int id, String userId, String amount, String createdAt, String transactionId) {
-        this.id = id;
+    public Withdraw(String userId, double amount, String transactionId) {
         this.userId = userId;
         this.amount = amount;
-        this.createdAt = createdAt;
+        this.createdAt = new Date();
         this.transactionId = transactionId;
     }
 
@@ -47,19 +48,19 @@ public class Withdraw {
         this.userId = userId;
     }
 
-    public String getAmount() {
+    public double getAmount() {
         return this.amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return this.createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 

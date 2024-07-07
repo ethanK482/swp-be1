@@ -19,6 +19,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import swp.group2.swpbe.CloudinaryService;
 import swp.group2.swpbe.constant.ExpertRequestStatus;
+import swp.group2.swpbe.constant.UserRole;
 import swp.group2.swpbe.exception.ApiRequestException;
 import swp.group2.swpbe.expert.entities.ExpertRequest;
 import swp.group2.swpbe.user.UserRepository;
@@ -44,6 +45,9 @@ public class ExpertRequestService {
 
     @Value("${stripe.api.key}")
     private String stripeApiKey;
+
+    @Value("${allow.origin}")
+    private String allowedOrigins;
 
     public void saveRequest(String userId, MultipartFile file) {
         ExpertRequest expertRequest = new ExpertRequest();
@@ -88,7 +92,7 @@ public class ExpertRequestService {
         AccountLinkCreateParams paramsLink = AccountLinkCreateParams.builder()
                 .setAccount(accountId)
                 .setRefreshUrl("https://example.com/reauth")
-                .setReturnUrl("https://example.com/return")
+                .setReturnUrl(allowedOrigins + "/profile")
                 .setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
                 .build();
         try {
@@ -98,6 +102,8 @@ public class ExpertRequestService {
                         "Click here to complete your wallet information" + " " + accountLink.getUrl());
                 expertRequest.setState(ExpertRequestStatus.ACCEPTED);
                 expertRequestRepository.save(expertRequest);
+                user.setRole(UserRole.EXPERT);
+                userRepository.save(user);
             } catch (MessagingException e) {
                 throw new ApiRequestException("Can't send mail", HttpStatus.INTERNAL_SERVER_ERROR);
             }
