@@ -24,6 +24,7 @@ import swp.group2.swpbe.user.dto.SignupDTO;
 import swp.group2.swpbe.user.dto.UpdatePasswordDTO;
 import swp.group2.swpbe.user.dto.UpdateProfileDTO;
 import swp.group2.swpbe.user.entities.User;
+import swp.group2.swpbe.user.entities.Withdraw;
 import swp.group2.swpbe.user.response.LoginResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -137,6 +138,12 @@ public class UserController {
     @GetMapping("public/users")
     public List<User> getAllUser() {
         return userService.getAllUser();
+    }
+
+    @GetMapping("withdraw/histories")
+    public List<Withdraw> withdrawHistories(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        return userService.listWithdraws(userId);
     }
 
     @PutMapping("user/state/{id}")
