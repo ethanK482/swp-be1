@@ -34,6 +34,7 @@ import swp.group2.swpbe.user.dto.UpdatePasswordDTO;
 import swp.group2.swpbe.user.dto.UpdateProfileDTO;
 import swp.group2.swpbe.user.entities.User;
 import swp.group2.swpbe.user.entities.Wallet;
+import swp.group2.swpbe.user.entities.Withdraw;
 import swp.group2.swpbe.user.response.UserProfileResponse;
 
 @Service
@@ -50,6 +51,8 @@ public class UserService {
     FlashcardRepository flashcardRepository;
     @Autowired
     WalletRepository walletRepository;
+    @Autowired
+    WithdrawRepository withdrawRepository;
     int strength = 10;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(strength, new SecureRandom());
 
@@ -90,6 +93,10 @@ public class UserService {
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<Withdraw> listWithdraws(String userId) {
+        return withdrawRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public void sendMail(
