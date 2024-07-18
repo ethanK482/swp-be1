@@ -11,4 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface WithdrawRepository extends JpaRepository<Withdraw, Integer> {
     List<Withdraw> findByUserIdOrderByCreatedAtDesc(String userId);
+    List<Withdraw> findAll();
 }

@@ -268,6 +268,10 @@ public class UserService {
 
     }
 
+    public List<Withdraw> listAllWithdraws() {
+        return withdrawRepository.findAll();
+    }
+
     public List<User> getAllExpert() {
         return userRepository.findByRole(UserRole.EXPERT);
     }

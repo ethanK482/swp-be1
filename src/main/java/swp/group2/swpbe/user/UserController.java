@@ -146,6 +146,11 @@ public class UserController {
         return userService.listWithdraws(userId);
     }
 
+    @GetMapping("withdraw/all-histories")
+    public List<Withdraw> allWithdrawHistories() {
+        return userService.listAllWithdraws();
+    }
+
     @PutMapping("user/state/{id}")
     public ResponseEntity<?> putMethodName(@PathVariable int id, @RequestHeader("Authorization") String token,
             @RequestBody int state) {

@@ -64,6 +64,10 @@ public class ExpertRequestService {
         return expertRequestRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public List<ExpertRequest> getAllExpertByUserId(String userId) {
+        return expertRequestRepository.findByUserId(userId);
+    }
+
     public List<ExpertRequest> getOwnExpertRequests(String userId) {
         return expertRequestRepository.findByUserId(userId);
     }

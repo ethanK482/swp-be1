@@ -20,6 +20,7 @@ public class ExpertRequestController {
     @Autowired
     UserService userService;
 
+
     @PostMapping("expert-request")
     public ResponseEntity<?> createExpertRequest(
             @RequestHeader("Authorization") String token,
@@ -42,6 +43,12 @@ public class ExpertRequestController {
             throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
         }
         return expertRequestService.getAllExpert();
+    }
+
+    @GetMapping("/expert-requests/my-request")
+    public List<ExpertRequest> getExpertRequestbyUserId(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        return expertRequestService.getAllExpertByUserId(userId);
     }
 
     @GetMapping("/expert-requests/own")
