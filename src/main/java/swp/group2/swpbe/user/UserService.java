@@ -60,7 +60,7 @@ public class UserService {
     private String allowedOrigins;
 
     public User signup(SignupDTO user) {
-        String full_name = user.getFull_name();
+        String fullName = user.getFullName();
         String email = user.getEmail().toLowerCase();
         String password = bCryptPasswordEncoder.encode(user.getPassword());
         if (userRepository.findByEmail(email) != null) {
@@ -74,7 +74,7 @@ public class UserService {
             throw new ApiRequestException("Failed to send mail", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        User newUser = userRepository.save(new User(full_name, email, password,
+        User newUser = userRepository.save(new User(fullName, email, password,
                 "http://res.cloudinary.com/dswewjrly/image/upload/v1715831315/wmndhsmpxuihewekekzy.jpg", 0, null));
         newUser.setPassword("");
         return newUser;
@@ -119,7 +119,7 @@ public class UserService {
         } catch (Exception e) {
             throw new ApiRequestException("Invalid token", HttpStatus.BAD_REQUEST);
         }
-        User user = userRepository.findByEmailAndSid(email, null);
+        User user = userRepository.findByEmail(email);
         user.setState(1);
         user.setUpdatedAt(new Date());
         return userRepository.save(user);
@@ -143,7 +143,7 @@ public class UserService {
             throw new ApiRequestException("Invalid token!", HttpStatus.BAD_REQUEST);
         }
 
-        User user = userRepository.findByEmailAndSid(email, null);
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new ApiRequestException("User not found!", HttpStatus.BAD_REQUEST);
         }
@@ -161,15 +161,14 @@ public class UserService {
             }
             return userExist;
         }
-        userRepository.save(
-                new User(user.getName(), user.getEmail().toLowerCase(), null, user.getPicture(), 1, user.getS_id()));
-        User createdUser = userRepository.findBySid(user.getS_id());
-        return createdUser;
+        return userRepository.save(
+                new User(user.getName(), user.getEmail().toLowerCase(), null, user.getPicture(), 1, user.getSid()));
+
     }
 
     public User login(LoginDTO body) {
         String email = body.getEmail().toLowerCase();
-        User user = userRepository.findByEmailAndSid(email, null);
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new ApiRequestException("Email not found", HttpStatus.BAD_REQUEST);
         }
@@ -181,7 +180,7 @@ public class UserService {
         }
         String password = body.getPassword();
         boolean isCorrectPassword = bCryptPasswordEncoder.matches(password, user.getPassword());
-        if (isCorrectPassword == false) {
+        if (!isCorrectPassword) {
             throw new ApiRequestException("Wrong password", HttpStatus.BAD_REQUEST);
         }
         return user;

@@ -13,9 +13,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import swp.group2.swpbe.constant.ResourceStatus;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,81 +51,6 @@ public class Document {
         this.topicId = topicId;
         this.title = title;
         this.state = ResourceStatus.pending;
-    }
-
-    public Document() {
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFileUrl() {
-        return this.fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public Date getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getUserId() {
-        return this.userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getTopicId() {
-        return this.topicId;
-    }
-
-    public void setTopicId(String topicId) {
-        this.topicId = topicId;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<DocumentReview> getReviews() {
-        return this.reviews;
-    }
-
-    public void setReviews(List<DocumentReview> reviews) {
-        this.reviews = reviews;
-    }
-
-    public ResourceStatus getState() {
-        return this.state;
-    }
-
-    public void setState(ResourceStatus state) {
-        this.state = state;
     }
 
 }

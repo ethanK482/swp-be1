@@ -8,11 +8,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import swp.group2.swpbe.constant.ExpertRequestStatus;
 
 import java.util.Date;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "expert_request")
 public class ExpertRequest {
 
@@ -34,49 +40,6 @@ public class ExpertRequest {
         this.cvUrl = cvUrl;
         this.createdAt = createdAt;
         this.state = state;
-    }
-
-    public ExpertRequest() {
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return this.userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getCvUrl() {
-        return this.cvUrl;
-    }
-
-    public void setCvUrl(String cvUrl) {
-        this.cvUrl = cvUrl;
-    }
-
-    public ExpertRequestStatus getState() {
-        return this.state;
-    }
-
-    public void setState(ExpertRequestStatus state) {
-        this.state = state;
-    }
-
-    public Date getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
 }

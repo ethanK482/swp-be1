@@ -8,9 +8,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import swp.group2.swpbe.constant.ReviewState;
 
 @Entity(name = "document_review")
+@Getter
+@Setter
+@NoArgsConstructor
 public class DocumentReview {
     @Id
     private int id;
@@ -23,45 +29,9 @@ public class DocumentReview {
     @JsonBackReference
     private Document document;
 
-    public DocumentReview() {
-    }
-
     public DocumentReview(ReviewState state, String userId, Document document) {
         this.state = state;
         this.userId = userId;
-        this.document = document;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-   
-    public ReviewState getState() {
-        return this.state;
-    }
-
-    public void setState(ReviewState state) {
-        this.state = state;
-    }
-
-    public String getUserId() {
-        return this.userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Document getDocument() {
-        return this.document;
-    }
-
-    public void setDocument(Document document) {
         this.document = document;
     }
 

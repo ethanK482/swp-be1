@@ -50,11 +50,11 @@ public class PaymentController {
     CourseOrderRepository courseOrderRepository;
     @Autowired
     WithdrawRepository withdrawRepository;
+    @Autowired
+    WalletRepository walletRepository;
 
     @Value("${allow.origin}")
     private String allowedOrigins;
-    @Autowired
-    WalletRepository walletRepository;
     @Value("${stripe.api.key}")
     private String stripeApiKey;
     @Value("${stripe.sign.secret}")

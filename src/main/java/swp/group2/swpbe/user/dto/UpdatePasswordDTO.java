@@ -1,32 +1,16 @@
 package swp.group2.swpbe.user.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdatePasswordDTO {
     private String newPassword;
     private String oldPassword;
-
-    public UpdatePasswordDTO() {
-    }
-
-    public UpdatePasswordDTO( String newPassword, String oldPassword) {      
-        this.newPassword = newPassword;
-        this.oldPassword = oldPassword;
-    }
-
-
-    public String getNewPassword() {
-        return this.newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public String getOldPassword() {
-        return this.oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
 
 }

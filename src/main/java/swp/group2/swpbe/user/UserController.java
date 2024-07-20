@@ -147,7 +147,11 @@ public class UserController {
     }
 
     @GetMapping("withdraw/all-histories")
-    public List<Withdraw> allWithdrawHistories() {
+    public List<Withdraw> allWithdrawHistories(@RequestHeader("Authorization") String token) {
+        String userId = authService.loginUser(token);
+        if (!authService.isAdmin(userId)) {
+            throw new ApiRequestException("FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
         return userService.listAllWithdraws();
     }
 

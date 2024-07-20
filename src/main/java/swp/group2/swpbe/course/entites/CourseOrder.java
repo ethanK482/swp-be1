@@ -13,9 +13,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import swp.group2.swpbe.constant.PaymentStatus;
 
 @Entity(name = "course_order")
+@Getter
+@Setter
+@NoArgsConstructor
 public class CourseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,63 +40,12 @@ public class CourseOrder {
     @JsonBackReference
     private Course course;
 
-    public CourseOrder() {
-    }
-
     public CourseOrder(Course course, int userId, PaymentStatus paymentStatus, String transactionId) {
         this.course = course;
         this.userId = userId;
         this.paymentStatus = paymentStatus;
         this.createdAt = new Date();
         this.transactionId = transactionId;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return this.userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public PaymentStatus getPaymentStatus() {
-        return this.paymentStatus;
-    }
-
-    public void setPaymentStatus(PaymentStatus paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
-    public Date getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getTransactionId() {
-        return this.transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    public Course getCourse() {
-        return this.course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
     }
 
 }

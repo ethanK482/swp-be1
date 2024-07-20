@@ -1,22 +1,15 @@
 package swp.group2.swpbe.user.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReverifyDTO {
     private String email;
 
-    // Constructors
-    public ReverifyDTO() {
-        // Default constructor
-    }
-
-    public ReverifyDTO( String email) {
-
-        this.email = email;
-    }
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

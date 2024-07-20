@@ -9,8 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,53 +31,10 @@ public class Lesson {
     @JsonBackReference
     private Course course;
 
-    public Lesson() {
-    }
-
     public Lesson(String videoUrl, int lessonOrder, String name) {
         this.videoUrl = videoUrl;
         this.lessonOrder = lessonOrder;
         this.name = name;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getVideoUrl() {
-        return this.videoUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
-
-    public int getLessonOrder() {
-        return this.lessonOrder;
-    }
-
-    public void setLessonOrder(int lessonOrder) {
-        this.lessonOrder = lessonOrder;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Course getCourse() {
-        return this.course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
     }
 
 }
